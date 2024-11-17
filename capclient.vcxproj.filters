@@ -15,37 +15,48 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="capclient.cpp">
+    <ClInclude Include="src\events.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\hook.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\log.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\screenshot.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="process.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\capclient.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="hook.cpp">
+    <ClCompile Include="src\hook.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="utils.cpp">
+    <ClCompile Include="src\log.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="log.cpp">
+    <ClCompile Include="src\screenshot.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="screenshot.cpp">
+    <ClCompile Include="src\utils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="hook.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="utils.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="log.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="events.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="screenshot.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
+    <None Include="vcpkg.json">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include=".gitignore">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

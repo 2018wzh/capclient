@@ -14,7 +14,6 @@ int main()
 	bool adm = checkAdm();
 	if (!adm)
 		return elevateAdm();
-
 	khook.installHook();
 	mhook.installHook();
 	MSG msg;
