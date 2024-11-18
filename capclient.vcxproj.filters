@@ -33,6 +33,15 @@
     <ClInclude Include="process.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\journal.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\uuidxx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\session.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\capclient.cpp">
@@ -48,6 +57,18 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\utils.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\journal.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\events.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\uuidxx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\session.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

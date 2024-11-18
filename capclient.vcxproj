@@ -22,16 +22,23 @@
     <ClInclude Include="process.h" />
     <ClInclude Include="src\events.h" />
     <ClInclude Include="src\hook.h" />
+    <ClInclude Include="src\journal.h" />
     <ClInclude Include="src\log.h" />
     <ClInclude Include="src\screenshot.h" />
+    <ClInclude Include="src\session.h" />
     <ClInclude Include="src\utils.h" />
+    <ClInclude Include="src\uuidxx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\capclient.cpp" />
+    <ClCompile Include="src\events.cpp" />
     <ClCompile Include="src\hook.cpp" />
+    <ClCompile Include="src\journal.cpp" />
     <ClCompile Include="src\log.cpp" />
     <ClCompile Include="src\screenshot.cpp" />
+    <ClCompile Include="src\session.cpp" />
     <ClCompile Include="src\utils.cpp" />
+    <ClCompile Include="src\uuidxx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
@@ -106,6 +113,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -120,6 +129,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

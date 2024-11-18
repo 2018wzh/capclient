@@ -6,3 +6,4 @@ void wmMapInit();
 std::string wmConvert(int vkCode);
 bool checkAdm();
 bool elevateAdm();
+std::string base64Encode(const unsigned char* data, size_t len);

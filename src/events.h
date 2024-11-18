@@ -1,33 +1,26 @@
 #pragma once
-#include<string>
-#include<windows.h>
+#include <string>
+#include <windows.h>
 #include "utils.h"
+#include "uuidxx.h"
+#include "screenshot.h"
 struct baseEvent {
-	DWORD time,type;
+	uuidxx::uuid id;
+	DWORD time, type;
+	baseEvent();
+	bool operator <(const baseEvent& b) {
+		return time < b.time;
+	}
 	std::string friendlyName;
 };
-struct mouseEvent:baseEvent {
+struct mouseEvent :baseEvent {
 	int posX, posY;
-	mouseEvent(WPARAM w,MSLLHOOKSTRUCT* ks) {
-		time = ks->time;
-		type = w;
-		posX = ks->pt.x;
-		posY = ks->pt.y;
-		friendlyName = wmConvert(type);
-	}
+	mouseEvent(WPARAM w, MSLLHOOKSTRUCT* ks);
 };
 struct kbdEvent :baseEvent {
-	kbdEvent(KBDLLHOOKSTRUCT* ks) {
-		time = ks->time;
-		type = ks->vkCode;
-		friendlyName = vkConvert(type);
-	}
+	kbdEvent(KBDLLHOOKSTRUCT* ks);
 };
-struct screenEvent {
-	DWORD time;
-	std::wstring fileName;
-	screenEvent(DWORD t, std::wstring f) {
-		time = t;
-		fileName = f;
-	}
+struct screenEvent :baseEvent {
+	std::string content;
+	screenEvent(DWORD t,std::string file);
 };

@@ -124,3 +124,32 @@ bool elevateAdm() {
         return ShellExecuteEx(&sei);
     }
 }
+
+std::string base64Encode(const unsigned char* data, size_t len) {
+    static const char base64_chars[] =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+    std::string encoded;
+    int i = 0;
+    int val = 0;
+    int valb = -6;
+
+    for (size_t j = 0; j < len; ++j) {
+        val = (val << 8) + data[j];
+        valb += 8;
+        while (valb >= 0) {
+            encoded.push_back(base64_chars[(val >> valb) & 0x3F]);
+            valb -= 6;
+        }
+    }
+
+    if (valb > -6) {
+        encoded.push_back(base64_chars[((val << 8) >> (valb + 8)) & 0x3F]);
+    }
+
+    while (encoded.size() % 4) {
+        encoded.push_back('=');
+    }
+
+    return encoded;
+}

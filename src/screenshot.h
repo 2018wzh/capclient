@@ -1,3 +1,4 @@
 #pragma once
 #include <string>
-bool mkScreenshot(std::wstring fname);
+const int jpegQuality = 50;
+std::string mkScreenshot();
