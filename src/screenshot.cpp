@@ -4,24 +4,12 @@
 #include <windows.h>
 #include <turbojpeg.h>
 #include "utils.h"
+#include "logger.h"
 std::string mkScreenshot() {
-    // 获取系统临时目录
-    char tempPath[MAX_PATH];
-    if (!GetTempPathA(MAX_PATH, tempPath)) {
-        std::cerr << "Failed to get temp path" << std::endl;
-        return ""; // 返回空字符串表示失败
-    }
-
-    // 生成UUID并移除大括号
-    uuidxx::uuid id = uuidxx::uuid::Generate();
-    std::string idstr = id.ToString();
-    idstr.erase(std::remove(idstr.begin(), idstr.end(), '{'), idstr.end());
-    idstr.erase(std::remove(idstr.begin(), idstr.end(), '}'), idstr.end());
-    std::string fname = std::string(tempPath) + idstr + ".jpg";
-
+    
     HDC hdcScreen = GetDC(NULL);
     if (!hdcScreen) {
-        std::cerr << "Failed to get screen device context" << std::endl;
+        Logger::get_instance()->error("Failed to get screen device context");
         return "";
     }
 
@@ -32,7 +20,7 @@ std::string mkScreenshot() {
     // 创建与屏幕兼容的内存设备上下文
     HDC hdcMem = CreateCompatibleDC(hdcScreen);
     if (!hdcMem) {
-        std::cerr << "Failed to create compatible DC" << std::endl;
+        Logger::get_instance()->error("Failed to create compatible DC");
         ReleaseDC(NULL, hdcScreen);
         return "";
     }
@@ -40,7 +28,7 @@ std::string mkScreenshot() {
     // 创建一个与屏幕兼容的位图
     HBITMAP hBitmap = CreateCompatibleBitmap(hdcScreen, screenWidth, screenHeight);
     if (!hBitmap) {
-        std::cerr << "Failed to create compatible bitmap" << std::endl;
+        Logger::get_instance()->error("Failed to create compatible bitmap");
         DeleteDC(hdcMem);
         ReleaseDC(NULL, hdcScreen);
         return "";
@@ -51,7 +39,7 @@ std::string mkScreenshot() {
 
     // 将屏幕内容复制到内存DC中的位图
     if (!BitBlt(hdcMem, 0, 0, screenWidth, screenHeight, hdcScreen, 0, 0, SRCCOPY)) {
-        std::cerr << "Failed to capture screen content" << std::endl;
+        Logger::get_instance()->error("Failed to capture screen content");
         SelectObject(hdcMem, hOldBitmap);
         DeleteObject(hBitmap);
         DeleteDC(hdcMem);
@@ -70,7 +58,7 @@ std::string mkScreenshot() {
 
     BYTE* pPixels = new BYTE[screenWidth * screenHeight * 3];
     if (!GetDIBits(hdcMem, hBitmap, 0, screenHeight, pPixels, (BITMAPINFO*)&biHeader, DIB_RGB_COLORS)) {
-        std::cerr << "Failed to retrieve bitmap data" << std::endl;
+        Logger::get_instance()->error("Failed to retrieve bitmap data");
         delete[] pPixels;
         SelectObject(hdcMem, hOldBitmap);
         DeleteObject(hBitmap);
@@ -82,7 +70,7 @@ std::string mkScreenshot() {
     // 使用 libjpeg-turbo 压缩为 JPEG
     tjhandle jpegCompressor = tjInitCompress();
     if (!jpegCompressor) {
-        std::cerr << "Failed to initialize libjpeg-turbo compressor" << std::endl;
+        Logger::get_instance()->error("Failed to initialize libjpeg-turbo compressor");
         delete[] pPixels;
         SelectObject(hdcMem, hOldBitmap);
         DeleteObject(hBitmap);
@@ -94,8 +82,8 @@ std::string mkScreenshot() {
     unsigned char* jpegBuffer = nullptr;  // JPEG 图像缓冲区
     unsigned long jpegSize = 0;           // JPEG 图像大小
 
-    if (tjCompress2(jpegCompressor, pPixels, screenWidth, 0, screenHeight, TJPF_RGB, &jpegBuffer, &jpegSize, TJSAMP_444, jpegQuality, TJFLAG_FASTDCT) != 0) {
-        std::cerr << "Failed to compress image: " << tjGetErrorStr() << std::endl;
+    if (tjCompress2(jpegCompressor, pPixels, screenWidth, 0, screenHeight, TJPF_RGB, &jpegBuffer, &jpegSize, TJSAMP_444, 90, TJFLAG_FASTDCT) != 0) {
+        Logger::get_instance()->error("Failed to compress image: {}", tjGetErrorStr());
         tjDestroy(jpegCompressor);
         delete[] pPixels;
         SelectObject(hdcMem, hOldBitmap);
@@ -116,6 +104,8 @@ std::string mkScreenshot() {
     DeleteObject(hBitmap);
     DeleteDC(hdcMem);
     ReleaseDC(NULL, hdcScreen);
+
+    Logger::get_instance()->info("Screenshot captured successfully");
 
     return base64Encoded; // 返回 Base64 编码后的字符串
 }

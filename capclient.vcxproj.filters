@@ -21,9 +21,6 @@
     <ClInclude Include="src\hook.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\log.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="src\screenshot.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -39,7 +36,10 @@
     <ClInclude Include="src\uuidxx.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\session.h">
+    <ClInclude Include="src\database.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\logger.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -48,9 +48,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\hook.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\log.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\screenshot.cpp">
@@ -68,7 +65,10 @@
     <ClCompile Include="src\uuidxx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\session.cpp">
+    <ClCompile Include="src\database.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\logger.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,26 +1,20 @@
 #pragma once
 #include <string>
 #include <windows.h>
-#include "utils.h"
 #include "uuidxx.h"
+#include <windows.h>
 #include "screenshot.h"
-struct baseEvent {
+enum class EventType {
+	Mouse,
+	Keyboard,
+	Screen
+};
+struct journalEvent {
+	journalEvent(KBDLLHOOKSTRUCT* ks);
+	journalEvent(MSLLHOOKSTRUCT* ks, WPARAM w);
+	journalEvent(DWORD time);
 	uuidxx::uuid id;
-	DWORD time, type;
-	baseEvent();
-	bool operator <(const baseEvent& b) {
-		return time < b.time;
-	}
-	std::string friendlyName;
-};
-struct mouseEvent :baseEvent {
-	int posX, posY;
-	mouseEvent(WPARAM w, MSLLHOOKSTRUCT* ks);
-};
-struct kbdEvent :baseEvent {
-	kbdEvent(KBDLLHOOKSTRUCT* ks);
-};
-struct screenEvent :baseEvent {
-	std::string content;
-	screenEvent(DWORD t,std::string file);
+	EventType type;
+	int time,value=0;
+	std::string data="", friendly;
 };

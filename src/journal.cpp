@@ -1,14 +1,22 @@
 #include "journal.h"
+#include "utils.h"
+#include "logger.h"
 #include <iostream>
-#define gLog std::cerr
-void journalOpen();
-void journalRecord(mouseEvent e) {
-	gLog << "[" << e.time << "] " << e.type << "->" << e.friendlyName << " pressed at (" << e.posX << "," << e.posY << ") " << std::endl;
+time_t start;
+Journal::Journal(std::string fname) {
+	db = new DB(fname);
+	sessionID = uuidxx::uuid::Generate();
+	time(&start);
+	Logger::get_instance()->info("[{}][{}] Session started", start,toStr(sessionID));
+	db->Open(toStr(sessionID), start);
 }
-void journalRecord(kbdEvent e) {
-	gLog << "[" << e.time << "] " << e.type << "->" << e.friendlyName << std::endl;
+void Journal::Record(journalEvent e) {
+	Logger::get_instance()->info("[{}][{}] {}", e.time,toStr(e.id),toStr(e.type));
+	db->Insert(e);
 }
-void journalRecord(screenEvent e) {
-	gLog << "[" << e.time << "] " << e.type << "->" << e.friendlyName<<std::endl;
+void Journal::Close() {
+	time_t end;
+	time(&end);
+	db->Close(end-start);
+	delete db;
 }
-void journalClose();

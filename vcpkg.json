@@ -1,7 +1,10 @@
 {
   "dependencies": [
-    "rapidjson",
+    "jsoncpp",
     "curl",
-    "libjpeg-turbo"
+    "libjpeg-turbo",
+    "sqlitecpp",
+    "sqlite3",
+    "spdlog"
   ]
 }

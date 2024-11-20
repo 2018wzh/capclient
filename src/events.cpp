@@ -1,23 +1,34 @@
 #include "events.h"
-baseEvent::baseEvent() {
+#include "utils.h"
+#include <ctime>
+#include <json/json.h>
+Json::StreamWriterBuilder writer;
+journalEvent::journalEvent(MSLLHOOKSTRUCT* ks, WPARAM w) {
+	writer["indentation"] = "";
 	id = uuidxx::uuid::Generate();
-}
-mouseEvent::mouseEvent(WPARAM w, MSLLHOOKSTRUCT* ks) {
-	id = uuidxx::uuid::Generate();
+	type = EventType::Mouse;
 	time = ks->time;
-	type = w;
-	posX = ks->pt.x;
-	posY = ks->pt.y;
-	friendlyName = wmConvert(type);
+	Json::Value doc;
+	doc["value"] = int(w);
+	doc["friendly"] = wmConvert(w);
+	doc["posX"] = int(ks->pt.x);
+	doc["posY"] = int(ks->pt.y);
+	data = Json::writeString(writer, doc);
 }
-kbdEvent::kbdEvent(KBDLLHOOKSTRUCT* ks) {
+journalEvent::journalEvent(KBDLLHOOKSTRUCT* ks) {
+	writer["indentation"] = "";
 	id = uuidxx::uuid::Generate();
+	type = EventType::Keyboard;
 	time = ks->time;
-	type = ks->vkCode;
-	friendlyName = vkConvert(type);
+	Json::Value doc;
+	doc["value"] = int(ks->vkCode);
+	doc["friendly"] = vkConvert(ks->vkCode);
+	data = Json::writeString(writer, doc);
 }
-screenEvent::screenEvent(DWORD t,std::string file) {
+journalEvent::journalEvent(DWORD tm) {
 	id = uuidxx::uuid::Generate();
-	time = t;
-	content = file;
+	type = EventType::Screen;
+	time = tm;
+	data = mkScreenshot();
+	friendly = "Screenshot";
 }

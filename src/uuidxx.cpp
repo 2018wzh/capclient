@@ -8,7 +8,7 @@
 #include "uuidxx.h"
 #include <random>
 #include <stdio.h>
-#include <inttypes.h>
+#include <cinttypes>
 #include <string.h>
 
 using namespace std;

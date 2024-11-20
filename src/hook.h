@@ -1,14 +1,9 @@
 #pragma once
 #include <windows.h>
-class kbdHook
+#include "journal.h"
+class Hook
 {
 public:
-    void installHook();
-    void unInstallHook();
-};
-class mouseHook
-{
-public:
-    void installHook();
+    bool installHook();
     void unInstallHook();
 };

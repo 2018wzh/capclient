@@ -1,52 +1,49 @@
 ﻿#include "hook.h"
-#include "log.h"
+#include "logger.h"
 #include "events.h"
 #include "journal.h"
 #include "screenshot.h"
 #include <iostream>
-static HHOOK keyHook = nullptr;
-static kbdHook* khook;
-static mouseHook* mhook;
-static HHOOK mseHook = nullptr;
-
+HHOOK keyHook, mseHook;
+DWORD last=0;
+Journal hookJournal("journal.db");
 LRESULT CALLBACK keyProc(int nCode, WPARAM wParam, LPARAM lParam) {
     KBDLLHOOKSTRUCT* ks = (KBDLLHOOKSTRUCT*)lParam;
-    journalRecord(ks);
+    if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)
+       hookJournal.Record(journalEvent(ks));         //keyboard
+    if (ks->vkCode == VK_ESCAPE) {
+        Logger::get_instance()->info("ESC pressed, exiting");
+        PostQuitMessage(0);
+    }
     return CallNextHookEx(keyHook, nCode, wParam, lParam);
 }
-
-void kbdHook::installHook() {
-    keyHook = SetWindowsHookEx(WH_KEYBOARD_LL, keyProc, nullptr, 0);
-    if (!keyHook)
-        std::cerr << "KeyboardHook failed" << std::endl;
-    else
-        std::cerr << "KeyboardHook success" << std::endl;
-    khook = this;
-
-}
-void kbdHook::unInstallHook() {
-    UnhookWindowsHookEx(keyHook);
-    keyHook = nullptr;
-}
-
 LRESULT CALLBACK mouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
     MSLLHOOKSTRUCT* ks = (MSLLHOOKSTRUCT*)lParam;
-    if (wParam != WM_MOUSEMOVE) {
-        journalRecord(mouseEvent(wParam, ks));
-        journalRecord(screenEvent(ks->time,mkScreenshot()));
+    if (wParam != WM_MOUSEMOVE && ks->time-last>=1000) {
+        hookJournal.Record(journalEvent(ks,wParam));          //mouse
+        hookJournal.Record(journalEvent(ks->time));           //screenshot
+        last = ks->time;
     }
     return CallNextHookEx(mseHook, nCode, wParam, lParam);
 }
 
-void mouseHook::installHook() {
+bool Hook::installHook() {
+    keyHook = SetWindowsHookEx(WH_KEYBOARD_LL, keyProc, nullptr, 0);
     mseHook = SetWindowsHookEx(WH_MOUSE_LL, mouseProc, nullptr, 0);
-    if (!mseHook)
-        std::cerr << "MouseHook failed" << std::endl;
-    else
-        std::cerr << "MouseHook success" << std::endl;
-    mhook = this;
+    if (!keyHook || !mseHook) {
+        if(!keyHook)
+            Logger::get_instance()->critical("KeyboardHook failed");
+        if(!mseHook)
+            Logger::get_instance()->critical("MouseHook failed");
+        return 0;
+    }
+    Logger::get_instance()->info("Hook success");
+    return 1;
 }
-void mouseHook::unInstallHook() {
+void Hook::unInstallHook() {
     UnhookWindowsHookEx(mseHook);
     mseHook = nullptr;
+    UnhookWindowsHookEx(keyHook);
+    keyHook = nullptr;
+    hookJournal.Close();
 }
