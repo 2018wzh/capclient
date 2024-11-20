@@ -4,7 +4,9 @@
 #include <windows.h>
 #include <turbojpeg.h>
 #include "utils.h"
+#include <filesystem>
 #include "logger.h"
+#include <fstream>
 std::string mkScreenshot() {
     
     HDC hdcScreen = GetDC(NULL);
@@ -82,7 +84,7 @@ std::string mkScreenshot() {
     unsigned char* jpegBuffer = nullptr;  // JPEG 图像缓冲区
     unsigned long jpegSize = 0;           // JPEG 图像大小
 
-    if (tjCompress2(jpegCompressor, pPixels, screenWidth, 0, screenHeight, TJPF_RGB, &jpegBuffer, &jpegSize, TJSAMP_444, 90, TJFLAG_FASTDCT) != 0) {
+    if (tjCompress2(jpegCompressor, pPixels, screenWidth, 0, screenHeight, TJPF_BGR, &jpegBuffer, &jpegSize, TJSAMP_444, 90, TJFLAG_FASTDCT) != 0) {
         Logger::get_instance()->error("Failed to compress image: {}", tjGetErrorStr());
         tjDestroy(jpegCompressor);
         delete[] pPixels;
@@ -93,9 +95,27 @@ std::string mkScreenshot() {
         return "";
     }
 
+    std::string outputFolder = "out";
+    std::filesystem::create_directories(outputFolder);
     // 将 JPEG 数据进行 Base64 编码
-    std::string base64Encoded = base64Encode(jpegBuffer, jpegSize);
+    //std::string base64Encoded = base64Encode(jpegBuffer, jpegSize);
+    time_t t = time(nullptr);
+    std::string filename = "out/screenshot_" + std::to_string(t) + ".jpg";
+    std::ofstream outFile(filename, std::ios::binary);
+    if (!outFile) {
+        Logger::get_instance()->error("Failed to create output file: {}", filename);
+        tjFree(jpegBuffer);
+        tjDestroy(jpegCompressor);
+        delete[] pPixels;
+        SelectObject(hdcMem, hOldBitmap);
+        DeleteObject(hBitmap);
+        DeleteDC(hdcMem);
+        ReleaseDC(NULL, hdcScreen);
+        return "";
+    }
 
+    outFile.write(reinterpret_cast<const char*>(jpegBuffer), jpegSize);
+    outFile.close();
     // 清理
     tjFree(jpegBuffer);
     tjDestroy(jpegCompressor);
@@ -104,8 +124,7 @@ std::string mkScreenshot() {
     DeleteObject(hBitmap);
     DeleteDC(hdcMem);
     ReleaseDC(NULL, hdcScreen);
-
-    Logger::get_instance()->info("Screenshot captured successfully");
-
-    return base64Encoded; // 返回 Base64 编码后的字符串
+    Logger::get_instance()->info("Screenshot saved to file: {}", filename);
+    return filename;
+    //return base64Encoded; // 返回 Base64 编码后的字符串
 }
