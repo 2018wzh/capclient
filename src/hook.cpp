@@ -19,7 +19,7 @@ LRESULT CALLBACK keyProc(int nCode, WPARAM wParam, LPARAM lParam) {
 }
 LRESULT CALLBACK mouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
     MSLLHOOKSTRUCT* ks = (MSLLHOOKSTRUCT*)lParam;
-    if (wParam != WM_MOUSEMOVE && ks->time-last>=1000) {
+    if (wParam != WM_MOUSEMOVE && ks->time-last>=interval) {
         hookJournal.Record(journalEvent(ks,wParam));          //mouse
         hookJournal.Record(journalEvent(ks->time));           //screenshot
         last = ks->time;
