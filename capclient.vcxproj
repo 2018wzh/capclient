@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="process.h" />
-    <ClInclude Include="src\database.h" />
     <ClInclude Include="src\events.h" />
     <ClInclude Include="src\hook.h" />
     <ClInclude Include="src\journal.h" />
@@ -31,7 +30,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\capclient.cpp" />
-    <ClCompile Include="src\database.cpp" />
     <ClCompile Include="src\events.cpp" />
     <ClCompile Include="src\hook.cpp" />
     <ClCompile Include="src\journal.cpp" />

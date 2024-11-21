@@ -1,7 +1,7 @@
 #include "screenshot.h"
 #include "uuidxx.h"
 #include <iostream>
-#include <windows.h>
+#include <Windows.h>
 #include <turbojpeg.h>
 #include "utils.h"
 #include <filesystem>
@@ -16,9 +16,16 @@ std::string mkScreenshot() {
     }
 
     // 获取屏幕的宽高
-    int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-    int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+    //int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+    //int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+    DEVMODE devMode;
+    ZeroMemory(&devMode, sizeof(devMode));
+    devMode.dmSize = sizeof(devMode);
+    EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &devMode);
 
+    int screenWidth = devMode.dmPelsWidth;
+    int screenHeight = devMode.dmPelsHeight;
+    Logger::get_instance()->info("Screen info:height={};weight={}", screenHeight, screenWidth);
     // 创建与屏幕兼容的内存设备上下文
     HDC hdcMem = CreateCompatibleDC(hdcScreen);
     if (!hdcMem) {
