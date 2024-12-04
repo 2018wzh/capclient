@@ -10,10 +10,11 @@ enum class EventType {
 	Screen
 };
 struct journalEvent {
-	journalEvent(KBDLLHOOKSTRUCT* ks);
-	journalEvent(MSLLHOOKSTRUCT* ks, WPARAM w);
+	journalEvent(KBDLLHOOKSTRUCT* ks,bool isDown);
+	journalEvent(MSLLHOOKSTRUCT* ks, WPARAM w,bool isDown);
 	journalEvent(DWORD time);
 	uuidxx::uuid id;
+	std::string uid;
 	EventType type;
 	int time,value=0;
 	std::string data="", friendly;

@@ -1,9 +1,9 @@
 #pragma once
-#include <windows.h>
 #include "journal.h"
 class Hook
 {
 public:
-    bool installHook();
-    void unInstallHook();
+    static void installHook();
+    static void unInstallHook();
 };
+

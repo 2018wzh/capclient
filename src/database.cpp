@@ -1,17 +1,19 @@
 #include "database.h"
 #include "utils.h"
 #include "logger.h"
+#include "user.h"
 #include <iostream>
 DB::DB(std::string name) {
 	db = new SQLite::Database(name, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
 }
-void DB::Open(uuidxx::uuid id,time_t t) {
+void DB::Open(uuidxx::uuid id,time_t start) {
 	table = toStr(id);
 	try {
-		db->exec("CREATE TABLE IF NOT EXISTS sessions (uuid TEXT PRIMARY KEY, time INTEGER, duration INTEGER);");
-		SQLite::Statement ins2idx(*db, "INSERT INTO sessions (uuid, time) VALUES (?, ?);");
+		db->exec("CREATE TABLE IF NOT EXISTS sessions (uuid TEXT PRIMARY KEY, user TEXT, start INTEGER, end INTEGER);");
+		SQLite::Statement ins2idx(*db, "INSERT INTO sessions (uuid, user, start) VALUES (?, ?, ?);");
 		ins2idx.bind(1, table);
-		ins2idx.bind(2, t);
+		ins2idx.bind(2, getUser().id);
+		ins2idx.bind(3, start);
 		ins2idx.exec();
 		db->exec("CREATE TABLE IF NOT EXISTS '" + table + "' (uuid TEXT PRIMARY KEY, type TEXT, time INTEGER, data TEXT); ");
 	}
@@ -33,11 +35,11 @@ void DB::Insert(journalEvent e) {
 		Logger::get_instance()->warn(e.what());
 	}
 }
-void DB::Close(time_t d) {
+void DB::Close(time_t end) {
 	try{
-		SQLite::Statement query(*db, "UPDATE sessions SET duration = ? WHERE uuid = ?");
+		SQLite::Statement query(*db, "UPDATE sessions SET end = ? WHERE uuid = ?");
 		query.bind(2, table);
-		query.bind(1, d);
+		query.bind(1, end);
 		query.exec();
 	}
 	catch (const std::exception& e) {

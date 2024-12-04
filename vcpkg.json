@@ -1,9 +1,11 @@
 {
   "dependencies": [
     "jsoncpp",
-    "curl",
+    "restclient-cpp",
     "libjpeg-turbo",
     "sqlitecpp",
-    "spdlog"
+    "spdlog",
+    "amqpcpp",
+    "libevent"
   ]
 }

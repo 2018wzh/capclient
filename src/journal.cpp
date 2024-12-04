@@ -7,7 +7,7 @@ Journal::Journal(std::string fname) {
 	db = new DB(fname);
 	sessionID = uuidxx::uuid::Generate();
 	time(&start);
-	Logger::get_instance()->info("[{}][{}] Session started", start,toStr(sessionID));
+	Logger::get_instance()->info("[{}] Session started",toStr(sessionID));
 	db->Open(toStr(sessionID), start);
 }
 void Journal::Record(journalEvent e) {
@@ -17,6 +17,6 @@ void Journal::Record(journalEvent e) {
 void Journal::Close() {
 	time_t end;
 	time(&end);
-	db->Close(end-start);
+	db->Close(end);
 	delete db;
 }
