@@ -3,6 +3,7 @@
 #include "events.h"
 #include "journal.h"
 #include "screenshot.h"
+#include "config.h"
 #include <iostream>
 #include <unordered_map>
 #include <cassert>
@@ -62,7 +63,8 @@ LRESULT CALLBACK keyProc(int nCode, WPARAM wParam, LPARAM lParam) {
         if (ks->vkCode == VK_MENU || ks->vkCode == VK_LMENU || ks->vkCode == VK_RMENU) {
             flags::Alt = 0;
             Logger::get_instance()->debug("Alt up");
-        }Logger::get_instance()->debug("Key up: vkCode={}, time={}", ks->vkCode, ks->time);
+        }
+        Logger::get_instance()->debug("Key up: vkCode={}, time={}", ks->vkCode, ks->time);
         isDown = false;
     }
     return CallNextHookEx(keyHook, nCode, wParam, lParam);
@@ -86,7 +88,7 @@ LRESULT CALLBACK mouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
     return CallNextHookEx(mseHook, nCode, wParam, lParam);
 }
 void Hook::installHook(){
-    hookJournal = new Journal("journal.db");
+    hookJournal = new Journal(Config::dbFile);
     keyHook = SetWindowsHookEx(WH_KEYBOARD_LL, keyProc, nullptr, 0);
     mseHook = SetWindowsHookEx(WH_MOUSE_LL, mouseProc, nullptr, 0);
     if (!keyHook || !mseHook) {

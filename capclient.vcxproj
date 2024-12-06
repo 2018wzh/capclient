@@ -20,11 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\cmd.h" />
+    <ClInclude Include="src\config.h" />
     <ClInclude Include="src\database.h" />
     <ClInclude Include="src\events.h" />
     <ClInclude Include="src\hook.h" />
     <ClInclude Include="src\journal.h" />
     <ClInclude Include="src\logger.h" />
+    <ClInclude Include="src\mq.h" />
     <ClInclude Include="src\screenshot.h" />
     <ClInclude Include="src\ui.h" />
     <ClInclude Include="src\user.h" />
@@ -34,11 +36,13 @@
   <ItemGroup>
     <ClCompile Include="src\capclient.cpp" />
     <ClCompile Include="src\cmd.cpp" />
+    <ClCompile Include="src\config.cpp" />
     <ClCompile Include="src\database.cpp" />
     <ClCompile Include="src\events.cpp" />
     <ClCompile Include="src\hook.cpp" />
     <ClCompile Include="src\journal.cpp" />
     <ClCompile Include="src\logger.cpp" />
+    <ClCompile Include="src\mq.cpp" />
     <ClCompile Include="src\screenshot.cpp" />
     <ClCompile Include="src\ui.cpp" />
     <ClCompile Include="src\user.cpp" />
@@ -47,6 +51,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+    <None Include="ClassDiagram.cd" />
+    <None Include="config.json" />
+    <None Include="triplets\x64-windows-7-static.cmake" />
+    <None Include="triplets\x64-windows-7.cmake" />
+    <None Include="vcpkg-configuration.json" />
     <None Include="vcpkg.json" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -120,6 +129,14 @@
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+    <VcpkgTriplet>x64-windows-7</VcpkgTriplet>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <VcpkgTriplet>x64-windows-7</VcpkgTriplet>
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -160,7 +177,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_WIN32_WINNT=0x0601;WINVER=0x0601;SQLITECPP_COMPILE_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_WIN32_WINNT=0x0601;WINVER=0x0601;CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -170,7 +187,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -179,7 +196,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_WIN32_WINNT=0x0601;WINVER=0x0601;SQLITECPP_COMPILE_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_WIN32_WINNT=0x0601;WINVER=0x0601;CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -191,8 +208,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
-      <AdditionalDependencies>turbojpeg.lib;SQLiteCpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <EmbedManagedResourceFile>turbojpeg.lib;SQLiteCpp.lib</EmbedManagedResourceFile>
+      <AdditionalDependencies>ws2_32.lib;wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EmbedManagedResourceFile>
+      </EmbedManagedResourceFile>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

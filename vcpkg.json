@@ -1,11 +1,10 @@
 {
   "dependencies": [
     "jsoncpp",
-    "restclient-cpp",
     "libjpeg-turbo",
     "sqlitecpp",
     "spdlog",
-    "amqpcpp",
-    "libevent"
+    "paho-mqttpp3",
+    "curlpp"
   ]
 }

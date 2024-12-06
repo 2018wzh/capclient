@@ -1,8 +1,10 @@
 ﻿#include "utils.h"
-#include<windows.h>
-#include<tchar.h>
+#include <windows.h>
+#include <tchar.h>
 #include <unordered_map>
 #include "logger.h"
+static const char base64_chars[] =
+"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 std::unordered_map<int, std::string> vkCodeToName;
 bool vkInit = 0;
 void vkMapInit() {
@@ -129,9 +131,6 @@ bool elevateAdm() {
 }
 
 std::string base64Encode(const unsigned char* data, size_t len) {
-    static const char base64_chars[] =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
     std::string encoded;
     int i = 0;
     int val = 0;
@@ -171,4 +170,14 @@ std::string toStr(EventType e){
     default:
         return "undefined";
     }
+}
+Json::Value toJson(std::string s) {
+    Json::Value jsonValue;
+    Json::CharReaderBuilder readerBuilder;
+    std::string errs;
+    std::istringstream sStream(s);
+    if (!Json::parseFromStream(readerBuilder, sStream, &jsonValue, &errs)) {
+        throw std::runtime_error("Parse Error:" + errs);
+    }
+    return jsonValue;
 }

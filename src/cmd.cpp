@@ -1,10 +1,11 @@
 #include "cmd.h"
 #include <unordered_map>
 #include "logger.h"
+#include "mq.h"
 #include "user.h"
 
-std::atomic<bool> running;
-std::thread runningThread;
+std::atomic<bool> hookRunning;
+std::thread hookThread;
 
 static const std::unordered_map<std::string, cmdType> commandMap = {
         {"/start", cmdType::START},
@@ -12,7 +13,8 @@ static const std::unordered_map<std::string, cmdType> commandMap = {
 		{"/exit", cmdType::EXIT},
 		{"/login", cmdType::LOGIN},
 		{"/logout", cmdType::LOGOUT},
-		{"/status", cmdType::STATUS}
+		{"/status", cmdType::STATUS},
+        {"/test", cmdType::TEST}
 };
 cmdType getCommand(const std::string& input){
     auto it = commandMap.find(input);
@@ -26,35 +28,46 @@ void cmd::start(std::function<void()> func) {
 		Logger::get_instance()->warn("Please login first");
         userLogin();
     }
-    if (!running.load()) {
-        running = true;
-        runningThread = std::thread(func);
+    if (!hookRunning.load()) {
+        hookRunning = true;
+        hookThread = std::thread(func);
         Logger::get_instance()->info("Starting Hook Thread");
     }
     else {
-        Logger::get_instance()->warn("Hook is already running");
+        Logger::get_instance()->warn("Hook is already Running");
     }
+    if (!mqRunning.load()) 
+		mqConnect();
+    else 
+        Logger::get_instance()->warn("MQ is already Running");
 }
 void cmd::stop() {
-    if (running.load()) {
-        running = false;
-        if (runningThread.joinable()) {
+    if (hookRunning.load()) {
+        hookRunning = false;
+        if (hookThread.joinable()) {
             // 发送一个空消息以确保 GetMessage 能够返回
-            PostThreadMessage(GetThreadId(static_cast<HANDLE>(runningThread.native_handle())), WM_QUIT, 0, 0);
-            runningThread.join();
+            PostThreadMessage(GetThreadId(static_cast<HANDLE>(hookThread.native_handle())), WM_QUIT, 0, 0);
+            hookThread.join();
         }
         Logger::get_instance()->info("Hook Stopped");
     }
     else {
-        Logger::get_instance()->warn("Hook is not running");
+        Logger::get_instance()->warn("Hook is not Running");
     }
+	if (mqRunning.load()) {
+		mqDisconnect();
+		Logger::get_instance()->info("MQ Disconnected");
+	}
+	else {
+		Logger::get_instance()->warn("MQ is not Running");
+	}
 }
 void cmd::exit() {
-    if (running.load()) {
-        running = false;
-        if (runningThread.joinable()) {
-            PostThreadMessage(GetThreadId(static_cast<HANDLE>(runningThread.native_handle())), WM_QUIT, 0, 0);
-            runningThread.join();
+    if (hookRunning.load()) {
+        hookRunning = false;
+        if (hookThread.joinable()) {
+            PostThreadMessage(GetThreadId(static_cast<HANDLE>(hookThread.native_handle())), WM_QUIT, 0, 0);
+            hookThread.join();
         }
         Logger::get_instance()->info("Hook Stopped");
     }
@@ -63,6 +76,7 @@ void cmd::exit() {
 }
 void cmd::login(){
 	userLogin();
+
 	Logger::get_instance()->info("User {} logged in", getUser().id);
 }
 void cmd::logout() {
@@ -76,5 +90,11 @@ void cmd::logout() {
 	}
 }
 void cmd::status() {
-	Logger::get_instance()->info("Hook is {}", running.load() ? "running" : "stopped");
+	Logger::get_instance()->info("Hook is {}", hookRunning.load() ? "hookRunning" : "stopped");
+	Logger::get_instance()->info("MQ is {}", mqRunning.load() ? "running" : "stopped");
+}
+void cmd::test() {
+	if (!mqRunning.load())
+		mqConnect();
+    mqSend("hello world");
 }

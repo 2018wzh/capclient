@@ -48,6 +48,12 @@
     <ClInclude Include="src\ui.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\config.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mq.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\capclient.cpp">
@@ -86,6 +92,12 @@
     <ClCompile Include="src\ui.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\config.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mq.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="vcpkg.json">
@@ -94,5 +106,18 @@
     <None Include=".gitignore">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="config.json">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="vcpkg-configuration.json">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="triplets\x64-windows-7-static.cmake">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="triplets\x64-windows-7.cmake">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

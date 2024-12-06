@@ -2,7 +2,7 @@
 #include <string>
 #include <windows.h>
 #include "uuidxx.h"
-#include <windows.h>
+#include <json/json.h>
 #include "screenshot.h"
 enum class EventType {
 	Mouse,
@@ -18,4 +18,5 @@ struct journalEvent {
 	EventType type;
 	int time,value=0;
 	std::string data="", friendly;
+	std::string toJson();
 };

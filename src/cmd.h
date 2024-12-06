@@ -5,8 +5,8 @@
 #include <functional>
 #include <unordered_map>
 
-extern std::atomic<bool> running;
-extern std::thread runningThread;
+extern std::atomic<bool> hookRunning;
+extern std::thread hookRunningThread;
 
 enum class cmdType {
     START,
@@ -15,6 +15,7 @@ enum class cmdType {
     LOGIN,
     LOGOUT,
     STATUS,
+    TEST,
     UNKNOWN
 };
 
@@ -27,4 +28,5 @@ namespace cmd {
     void login();
     void logout();
     void status();
+    void test();
 }

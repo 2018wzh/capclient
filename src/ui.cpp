@@ -2,7 +2,7 @@
 #include "logger.h"
 #include <iostream>
 #include <UIAutomation.h>
-void getUIElement(POINT pt) {
+UIElement getUIElement(POINT pt) {
 
 	HRESULT hr = CoInitialize(NULL);
 	IUIAutomation* pAutomation = nullptr;

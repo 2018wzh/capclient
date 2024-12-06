@@ -1,9 +1,9 @@
 #include "journal.h"
 #include "utils.h"
 #include "logger.h"
-#include <iostream>
-time_t start;
+#include "mq.h"
 Journal::Journal(std::string fname) {
+	time_t start;
 	db = new DB(fname);
 	sessionID = uuidxx::uuid::Generate();
 	time(&start);
@@ -12,6 +12,7 @@ Journal::Journal(std::string fname) {
 }
 void Journal::Record(journalEvent e) {
 	Logger::get_instance()->info("[{}][{}] {}", e.time,toStr(e.id),toStr(e.type));
+	mqSend(e);
 	db->Insert(e);
 }
 void Journal::Close() {

@@ -10,10 +10,6 @@ journalEvent::journalEvent(MSLLHOOKSTRUCT* ks, WPARAM w,bool isDown) {
 	type = EventType::Mouse;
 	time = ks->time;
 	Json::Value doc;
-	
-	if (isDown)
-		//getUIElement(ks->pt);
-	
 	if(isDown)
 		doc["action"] = "down";
 	else
@@ -46,4 +42,16 @@ journalEvent::journalEvent(DWORD tm) {
 	time = tm;
 	data = mkScreenshot();
 	friendly = "Screenshot";
+}
+std::string journalEvent::toJson() {
+	Json::StreamWriterBuilder writer;
+	writer["indentation"] = "";
+	Json::Value doc;
+	doc["id"] = toStr(id);
+	doc["uid"] = uid;
+	doc["type"] = toStr(type);
+	doc["time"] = time;
+	doc["data"] = data;
+	doc["friendly"] = friendly;
+	return Json::writeString(writer, doc);
 }

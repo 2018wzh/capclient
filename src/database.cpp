@@ -29,7 +29,7 @@ void DB::Insert(journalEvent e) {
 		query.bind(3, e.time);
 		query.bind(4, e.data);
 		query.exec();
-		Logger::get_instance()->info("Insert success");
+		Logger::get_instance()->debug("Insert success");
 	}
 	catch (const std::exception& e) {
 		Logger::get_instance()->warn(e.what());
