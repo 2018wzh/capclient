@@ -8,7 +8,12 @@
 #include <unordered_map>
 #include <cassert>
 #include <windows.h>
+#include <thread>
 #include "ui.h"
+#include "cmd.h"
+using namespace Hook;
+std::thread Hook::Thread;
+std::atomic<bool> Hook::Running = false;
 HHOOK keyHook = nullptr, mseHook = nullptr;
 DWORD last = 0, lastkey = 0;
 namespace flags {
@@ -18,7 +23,18 @@ namespace flags {
 }
 Journal* hookJournal = nullptr;
 
-LRESULT CALLBACK keyProc(int nCode, WPARAM wParam, LPARAM lParam) {
+void Hook::ThreadFunc() {
+	installHook();
+    MSG msg;
+    while (GetMessage(&msg, nullptr, 0, 0)) {
+        if (msg.message == WM_QUIT)
+            cmd::exit();
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+	unInstallHook();
+}
+static LRESULT CALLBACK keyProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
     if (nCode < 0) {
         return CallNextHookEx(keyHook, nCode, wParam, lParam);
@@ -34,7 +50,7 @@ LRESULT CALLBACK keyProc(int nCode, WPARAM wParam, LPARAM lParam) {
     
     if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) {
         if ((flags::Ctrl&&flags::Shift)||(flags::Ctrl&&(ks->vkCode!=VK_LSHIFT||ks->vkCode!=VK_RSHIFT))||flags::Alt) {
-            hookJournal->Record(journalEvent(ks->time)); // screenshot
+            hookJournal->Record(Event::Journal(ks->time)); // screenshot
         }
         if (ks->vkCode == VK_SHIFT||ks->vkCode==VK_LSHIFT || ks->vkCode == VK_RSHIFT) {
             flags::Shift = 1;
@@ -49,7 +65,7 @@ LRESULT CALLBACK keyProc(int nCode, WPARAM wParam, LPARAM lParam) {
             Logger::get_instance()->debug("Alt down");
         }
         isDown = true;
-        hookJournal->Record(journalEvent(ks, isDown)); // keyboard
+        hookJournal->Record(Event::Journal(ks, isDown)); // keyboard
     }
     else if (wParam == WM_KEYUP || wParam == WM_SYSKEYUP) {
         if (ks->vkCode == VK_SHIFT || ks->vkCode == VK_LSHIFT || ks->vkCode == VK_RSHIFT) {
@@ -70,7 +86,7 @@ LRESULT CALLBACK keyProc(int nCode, WPARAM wParam, LPARAM lParam) {
     return CallNextHookEx(keyHook, nCode, wParam, lParam);
 }
 
-LRESULT CALLBACK mouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
+static LRESULT CALLBACK mouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
     if (nCode < 0) {
         return CallNextHookEx(mseHook, nCode, wParam, lParam);
@@ -81,14 +97,15 @@ LRESULT CALLBACK mouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (wParam != WM_MOUSEMOVE) {
         if (wParam == WM_LBUTTONDOWN || wParam == WM_RBUTTONDOWN || wParam == WM_MBUTTONDOWN)
             isDown = true;
-        hookJournal->Record(journalEvent(ks, wParam, isDown)); // mouse
-        hookJournal->Record(journalEvent(ks->time)); // screenshot
+        hookJournal->Record(Event::Journal(ks, wParam, isDown)); // mouse
+        hookJournal->Record(Event::Journal(ks->time)); // screenshot
         last = ks->time;
     }
     return CallNextHookEx(mseHook, nCode, wParam, lParam);
 }
 void Hook::installHook(){
-    hookJournal = new Journal(Config::dbFile);
+    hookJournal = new Journal;
+	hookJournal->Open();
     keyHook = SetWindowsHookEx(WH_KEYBOARD_LL, keyProc, nullptr, 0);
     mseHook = SetWindowsHookEx(WH_MOUSE_LL, mouseProc, nullptr, 0);
     if (!keyHook || !mseHook) {

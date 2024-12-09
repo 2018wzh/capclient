@@ -2,17 +2,21 @@
 #include "utils.h"
 #include "logger.h"
 #include "mq.h"
-Journal::Journal(std::string fname) {
-	time_t start;
-	db = new DB(fname);
+#include "user.h"
+#include "config.h"
+Journal::Journal() {
+	db = new DB(Config::dbFile);
 	sessionID = uuidxx::uuid::Generate();
 	time(&start);
-	Logger::get_instance()->info("[{}] Session started",toStr(sessionID));
-	db->Open(toStr(sessionID), start);
+	Logger::get_instance()->info("[{}] Session started",Utils::toStr(sessionID));
 }
-void Journal::Record(journalEvent e) {
-	Logger::get_instance()->info("[{}][{}] {}", e.time,toStr(e.id),toStr(e.type));
-	mqSend(e);
+void Journal::Open() {
+	db->Open(Utils::toStr(sessionID), start);
+}
+void Journal::Record(Event::Journal e) {
+	Logger::get_instance()->info("[{}][{}] {}", e.time,Utils::toStr(e.id),Utils::toStr(e.type));
+	//currentMQ->Send(e);
+	MQ::Send(e);
 	db->Insert(e);
 }
 void Journal::Close() {

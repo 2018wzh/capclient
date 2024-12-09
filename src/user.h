@@ -1,9 +1,14 @@
 #pragma once
 #include <string>
-struct User {
-	std::string id="", name = "";
+class User {
+private:
+	std::string token = "";
+	bool isLoggedin = 0;
+public:
+	std::string id = "", name = "";
+	User(std::string token);
+	void Login();
+	void Logout();
+	bool Check() { return isLoggedin; }
 };
-void userLogin();
-void userLogout();
-User getUser();
-bool checkLogin();
+extern User* currentUser;

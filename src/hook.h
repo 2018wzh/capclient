@@ -1,9 +1,13 @@
 #pragma once
 #include "journal.h"
-class Hook
+#include <thread>
+#include <atomic>
+namespace Hook
 {
-public:
-    static void installHook();
-    static void unInstallHook();
+    extern std::atomic<bool> Running;
+    extern std::thread Thread;
+    void ThreadFunc();
+    void installHook();
+    void unInstallHook();
 };
 

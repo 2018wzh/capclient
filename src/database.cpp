@@ -7,12 +7,12 @@ DB::DB(std::string name) {
 	db = new SQLite::Database(name, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
 }
 void DB::Open(uuidxx::uuid id,time_t start) {
-	table = toStr(id);
+	table = Utils::toStr(id);
 	try {
 		db->exec("CREATE TABLE IF NOT EXISTS sessions (uuid TEXT PRIMARY KEY, user TEXT, start INTEGER, end INTEGER);");
 		SQLite::Statement ins2idx(*db, "INSERT INTO sessions (uuid, user, start) VALUES (?, ?, ?);");
 		ins2idx.bind(1, table);
-		ins2idx.bind(2, getUser().id);
+		ins2idx.bind(2, currentUser->id);
 		ins2idx.bind(3, start);
 		ins2idx.exec();
 		db->exec("CREATE TABLE IF NOT EXISTS '" + table + "' (uuid TEXT PRIMARY KEY, type TEXT, time INTEGER, data TEXT); ");
@@ -21,11 +21,11 @@ void DB::Open(uuidxx::uuid id,time_t start) {
 		Logger::get_instance()->critical(e.what());
 	}
 }
-void DB::Insert(journalEvent e) {
+void DB::Insert(Event::Journal e) {
 	try {
 		SQLite::Statement query(*db, "INSERT INTO '" + table + "' (uuid, type, time, data) VALUES (?, ?, ?, ?);");
-		query.bind(1, toStr(e.id));
-		query.bind(2, toStr(e.type));
+		query.bind(1, Utils::toStr(e.id));
+		query.bind(2, Utils::toStr(e.type));
 		query.bind(3, e.time);
 		query.bind(4, e.data);
 		query.exec();

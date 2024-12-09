@@ -1,12 +1,14 @@
 #pragma once
 #include "journal.h"
 #include <thread>
+#include "events.h"
 #include <atomic>
-extern std::atomic<bool> mqRunning;
-extern std::thread mqThread;
-struct mqEvent{};
-void mqConnect();
-void mqSend(journalEvent e);
-void mqSend(std::string s);
-void mqDisconnect();
-mqEvent mqReceive();
+namespace MQ {
+	extern std::atomic<bool> Running;
+	extern std::thread Thread;
+	void Connect();
+	void Send(Event::Journal e);
+	void Send(std::string s);
+	void Disconnect();
+	Event::MQcmd Receive();
+}

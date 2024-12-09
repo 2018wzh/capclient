@@ -6,8 +6,10 @@ class Journal{
 private:
 	DB *db;
 	uuidxx::uuid sessionID;
+	time_t start;
 public:
-	Journal(std::string filename);
-	void Record(journalEvent e);
+	Journal();
+	void Open();
+	void Record(Event::Journal e);
 	void Close();
 };

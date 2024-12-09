@@ -8,10 +8,16 @@
 #include <curlpp/Easy.hpp>
 #include <curlpp/Options.hpp>
 #include <sstream>
-
-User* currentUser = nullptr;
-void userLogin() {
-	currentUser=new User;
+User* currentUser;
+User::User(std::string token) {
+	if (token.empty())
+		throw std::exception("Token is empty");
+	id = "";
+	name = "";
+	this->token = token;
+	isLoggedin = false;
+}
+void User::Login() {
     try {
         curlpp::Cleanup cleanup;
         std::ostringstream responseStream;
@@ -21,24 +27,16 @@ void userLogin() {
         request.setOpt(new curlpp::options::WriteStream(&responseStream));
         request.perform();
 		std::string response = responseStream.str();
-		Json::Value responseJson=toJson(response);
-		currentUser->id = responseJson["result"].asString();
+		Json::Value responseJson=Utils::toJson(response);
+		id = responseJson["result"].asString();
     }
     catch (std::exception& e) {
 		Logger::get_instance()->error(e.what());
 		throw std::exception("Login failed");
     }
+	isLoggedin = 1;
 }
-void userLogout() {
-	if (!checkLogin())
+void User::Logout() {
+	if (!isLoggedin)
 		throw std::exception("Not logged in");
-	currentUser = nullptr;
-}
-inline bool checkLogin() {
-	if (currentUser == nullptr)
-		return false;
-	return true;
-}
-User getUser() {
-	return *currentUser;
 }

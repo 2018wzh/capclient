@@ -1,3 +1,5 @@
+// cmd.h
+
 #pragma once
 #include <string>
 #include <thread>
@@ -5,28 +7,31 @@
 #include <functional>
 #include <unordered_map>
 
-extern std::atomic<bool> hookRunning;
-extern std::thread hookRunningThread;
-
-enum class cmdType {
-    START,
-    STOP,
-    EXIT,
-    LOGIN,
-    LOGOUT,
-    STATUS,
-    TEST,
-    UNKNOWN
-};
-
-cmdType getCommand(const std::string& input);
-
 namespace cmd {
-    void start(std::function<void()> func);
+    extern bool exitFlag;
+    void start();
     void stop();
     void exit();
     void login();
     void logout();
     void status();
     void test();
+    void exec(const std::string& input);
+
+    enum class Type {
+        START,
+        STOP,
+        EXIT,
+        LOGIN,
+        LOGOUT,
+        STATUS,
+        TEST,
+        UNKNOWN
+    };
+
+    Type getCommand(const std::string& input);
+
+    typedef std::function<void()> CommandFunction;
+    extern std::unordered_map<Type, CommandFunction> commandMap;
 }
+

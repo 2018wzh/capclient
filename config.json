@@ -1,8 +1,9 @@
 {
-	"loginServer": "http://demosite.imwork.net/",
-	"loginToken": "9DB55BDB670632A80E6A55630CC9C59A",
-	"mqServer": "tcp://100.63.0.61:1883",
-	"mqUser": "rabbit",
-	"mqPass": "123456",
-	"dbFile": "journal.db"
+	"dbFile" : "journal.db",
+	"jpegQuality" : 0,
+	"loginServer" : "http://demosite.imwork.net/",
+	"loginToken" : "9DB55BDB670632A80E6A55630CC9C59A",
+	"mqPass" : "123456",
+	"mqServer" : "tcp://100.63.0.61:1883",
+	"mqUser" : "rabbit"
 }

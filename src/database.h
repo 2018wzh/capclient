@@ -9,7 +9,5 @@ private:
 public:
 	DB(std::string name);
 	void Open(uuidxx::uuid id,time_t t);
-	void Insert(journalEvent input);
-	void Close(time_t duration);
-	int Callback(void* NotUsed, int argc, char** argv, char** azColName);
-};
+	void Insert(Event::Journal input);
+	void Close(time_t duration);};

@@ -4,9 +4,10 @@
 #include "logger.h"
 namespace Config {
     std::string mqServer, loginServer, loginToken, mqUser, mqPass, dbFile;
+    int jpegQuality;
     std::string configFile = "config.json";
 }
-void readConfig() {
+void Config::Read() {
     std::ifstream file(Config::configFile);
     if (!file.is_open()) {
         Json::Value root;
@@ -16,6 +17,7 @@ void readConfig() {
         root["mqUser"] = "";
 		root["mqPass"] = "";
         root["dbFile"] = "journal.db";
+        root["jpegQuality"] = 50;
         std::ofstream outFile(Config::configFile);
         if (!outFile.is_open()) {
             Logger::get_instance()->error("Unable to create default config file");
@@ -36,9 +38,27 @@ void readConfig() {
         Config::mqPass = root["mqPass"].asString();
 		Config::mqUser = root["mqUser"].asString();
 		Config::dbFile = root["dbFile"].asString();
+		Config::jpegQuality = root["jpegQuality"].asInt();
     }
     catch (std::exception& e) {
         Logger::get_instance()->error(e.what());
         throw std::runtime_error("Config file is corrupted");
-    }
+    }   
+}
+void Config::Save() {
+	Json::Value root;
+	root["mqServer"] = Config::mqServer;
+	root["loginServer"] = Config::loginServer;
+	root["loginToken"] = Config::loginToken;
+	root["mqUser"] = Config::mqUser;
+	root["mqPass"] = Config::mqPass;
+	root["dbFile"] = Config::dbFile;
+	root["jpegQuality"] = Config::jpegQuality;
+	std::ofstream outFile(Config::configFile);
+	if (!outFile.is_open()) {
+		Logger::get_instance()->error("Unable to save config file");
+		throw std::runtime_error("Unable to save config file");
+	}
+	outFile << root;
+	outFile.close();
 }

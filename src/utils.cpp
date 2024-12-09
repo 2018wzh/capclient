@@ -7,7 +7,11 @@ static const char base64_chars[] =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 std::unordered_map<int, std::string> vkCodeToName;
 bool vkInit = 0;
-void vkMapInit() {
+std::unordered_map<int, std::string> wmCodeToName;
+bool wmInit = 0;
+
+
+void Utils::vkMapInit() {
     vkCodeToName[VK_BACK] = "Backspace";
     vkCodeToName[VK_TAB] = "Tab";
     vkCodeToName[VK_RETURN] = "Enter";
@@ -69,7 +73,7 @@ void vkMapInit() {
     vkCodeToName[VK_RMENU] = "RAlt";
     vkInit = 1;
 }
-std::string vkConvert(int vkCode) {
+std::string Utils::vkConvert(int vkCode) {
     if (!vkInit)
         vkMapInit();
     if (vkCodeToName.find(vkCode) != vkCodeToName.end()) {
@@ -83,9 +87,7 @@ std::string vkConvert(int vkCode) {
     return "Unknown";
 }
 
-std::unordered_map<int, std::string> wmCodeToName;
-bool wmInit = 0;
-void wmMapInit() {
+void Utils::wmMapInit() {
     wmCodeToName[WM_MOUSEMOVE] = "Move";
     wmCodeToName[WM_LBUTTONDOWN] = "LBDown";
     wmCodeToName[WM_LBUTTONUP] = "LBUp";
@@ -93,7 +95,7 @@ void wmMapInit() {
     wmCodeToName[WM_RBUTTONUP] = "RBUp";
     wmInit = 1;
 }
-std::string wmConvert(int vkCode) {
+std::string Utils::wmConvert(int vkCode) {
     if (!wmInit)
         wmMapInit();
     if (wmCodeToName.find(vkCode) != wmCodeToName.end()) {
@@ -102,7 +104,7 @@ std::string wmConvert(int vkCode) {
 
     return "Unknown";
 }
-bool checkAdm() {
+bool Utils::checkAdm() {
     BOOL isAdmin = FALSE;
     HANDLE hToken = NULL;
     if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
@@ -115,7 +117,7 @@ bool checkAdm() {
     }
     return isAdmin;
 }
-bool elevateAdm() {
+bool Utils::elevateAdm() {
     Logger::get_instance()->warn("Elevating");
     TCHAR szPath[MAX_PATH];
     if (GetModuleFileName(NULL, szPath, MAX_PATH)) {
@@ -130,7 +132,7 @@ bool elevateAdm() {
     return 1;
 }
 
-std::string base64Encode(const unsigned char* data, size_t len) {
+std::string Utils::base64Encode(const unsigned char* data, size_t len) {
     std::string encoded;
     int i = 0;
     int val = 0;
@@ -155,23 +157,23 @@ std::string base64Encode(const unsigned char* data, size_t len) {
 
     return encoded;
 }
-std::string toStr(uuidxx::uuid u) {
+std::string Utils::toStr(uuidxx::uuid u) {
     std::string o = u.ToString();
     return o.substr(1, o.length() - 2);
 }
-std::string toStr(EventType e){
+std::string Utils::toStr(Event::Type e){
     switch (e) {
-    case EventType::Mouse:
+    case Event::Type::Mouse:
         return "mouse";
-    case EventType::Keyboard:
+    case Event::Type::Keyboard:
         return "keyboard";
-    case EventType::Screen:
+    case Event::Type::Screen:
         return "screenshot";
     default:
         return "undefined";
     }
 }
-Json::Value toJson(std::string s) {
+Json::Value Utils::toJson(std::string s) {
     Json::Value jsonValue;
     Json::CharReaderBuilder readerBuilder;
     std::string errs;

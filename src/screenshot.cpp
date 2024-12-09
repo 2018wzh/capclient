@@ -5,7 +5,8 @@
 #include <turbojpeg.h>
 #include "utils.h"
 #include "logger.h"
-std::string mkScreenshot() {
+#include "config.h"
+std::string Screenshot::Make() {
     
     HDC hdcScreen = GetDC(NULL);
     if (!hdcScreen) {
@@ -82,7 +83,7 @@ std::string mkScreenshot() {
     unsigned char* jpegBuffer = nullptr;  // JPEG 图像缓冲区
     unsigned long jpegSize = 0;           // JPEG 图像大小
 
-    if (tjCompress2(jpegCompressor, pPixels, screenWidth, 0, screenHeight, TJPF_RGB, &jpegBuffer, &jpegSize, TJSAMP_444, 90, TJFLAG_FASTDCT) != 0) {
+    if (tjCompress2(jpegCompressor, pPixels, screenWidth, 0, screenHeight, TJPF_RGB, &jpegBuffer, &jpegSize, TJSAMP_444, Config::jpegQuality, TJFLAG_FASTDCT) != 0) {
         Logger::get_instance()->error("Failed to compress image: {}", tjGetErrorStr());
         tjDestroy(jpegCompressor);
         delete[] pPixels;
@@ -94,7 +95,7 @@ std::string mkScreenshot() {
     }
 
     // 将 JPEG 数据进行 Base64 编码
-    std::string base64Encoded = base64Encode(jpegBuffer, jpegSize);
+    std::string base64Encoded = Utils::base64Encode(jpegBuffer, jpegSize);
 
     // 清理
     tjFree(jpegBuffer);

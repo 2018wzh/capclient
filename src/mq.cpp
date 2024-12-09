@@ -11,19 +11,19 @@
 #include <condition_variable>
 #include <mutex>
 
-std::atomic<bool> mqRunning;
-std::thread mqThread;
-std::queue<journalEvent> messageQueue;
+std::atomic<bool> MQ::Running;
+std::thread MQ::Thread;
+std::queue<Event::Journal> messageQueue;
 std::mutex queueMutex;
 std::condition_variable cv;
 
-// 移动 mqtt::async_client 到全局，以便在 mqConnect 和 mqDisconnect 中使用
+// 移动 mqtt::async_client 到全局，以便在 MQ::Connect 和 MQ::DIsconnect 中使用
 mqtt::async_client* clientPtr = nullptr;
 
 void eventLoop() {
-    while (mqRunning) {
+    while (MQ::Running) {
         std::unique_lock<std::mutex> lock(queueMutex);
-        cv.wait(lock, [] { return !messageQueue.empty() || !mqRunning; });
+        cv.wait(lock, [] { return !messageQueue.empty() || !MQ::Running; });
 
         while (!messageQueue.empty()) {
             auto msg = messageQueue.front();
@@ -46,7 +46,7 @@ void eventLoop() {
     }
 }
 
-void mqConnect() {
+void MQ::Connect() {
     const std::string ADDRESS = Config::mqServer; // MQTT 服务器地址，例如 "tcp://localhost:1883"
     const std::string CLIENT_ID = "capclient_publisher";
 
@@ -61,26 +61,26 @@ void mqConnect() {
         // 连接到 MQTT 服务器
         mqtt::token_ptr conntok = clientPtr->connect(connOpts);
         conntok->wait();
-        mqRunning = true;
-        mqThread = std::thread(eventLoop);
+        MQ::Running = true;
+        MQ::Thread = std::thread(eventLoop);
     }
     catch (const mqtt::exception& e) {
         Logger::get_instance()->error("MQTT CONNECT ERROR: {}", e.what());
     }
 }
 
-void mqSend(journalEvent e) {
+void MQ::Send(Event::Journal e) {
     std::lock_guard<std::mutex> lock(queueMutex);
 	Logger::get_instance()->debug("Adding message to queue");
     messageQueue.push(e);
     cv.notify_one();
 }
 
-void mqDisconnect() {
-    mqRunning = false;
+void MQ::Disconnect() {
+    MQ::Running = false;
     cv.notify_one();
-    if (mqThread.joinable())
-        mqThread.join();
+    if (MQ::Thread.joinable())
+        MQ::Thread.join();
 
     try {
         if (clientPtr) {
@@ -93,7 +93,7 @@ void mqDisconnect() {
         Logger::get_instance()->error("MQTT DISCONNECT ERROR: {}", e.what());
     }
 }
-void mqSend(std::string s) {
+void MQ::Send(std::string s) {
     mqtt::message_ptr pubmsg = mqtt::make_message("capture", s);
     pubmsg->set_qos(1);
     if (clientPtr && clientPtr->is_connected())

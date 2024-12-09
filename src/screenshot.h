@@ -1,4 +1,5 @@
 #pragma once
 #include <string>
-const int jpegQuality = 20;
-std::string mkScreenshot();
+namespace Screenshot {
+	std::string Make();
+}
