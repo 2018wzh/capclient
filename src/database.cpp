@@ -27,7 +27,7 @@ void DB::Insert(Event::Journal e) {
 		query.bind(1, Utils::toStr(e.id));
 		query.bind(2, Utils::toStr(e.type));
 		query.bind(3, e.time);
-		query.bind(4, e.data);
+		query.bind(4, Utils::toStr(e.data));
 		query.exec();
 		Logger::get_instance()->debug("Insert success");
 	}

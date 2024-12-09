@@ -2,6 +2,7 @@
 //#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include "mq.h"
+#include "utils.h"
 #include <mqtt/async_client.h>
 #include <thread>
 #include <atomic>
@@ -31,7 +32,7 @@ void eventLoop() {
             lock.unlock();
 
             // 将 journalEvent 转换为字符串（需实现 toJson() 方法）
-            std::string payload = msg.toJson();
+            std::string payload = Utils::toStr(msg);
 
             // 创建 MQTT 消息并发布
             mqtt::message_ptr pubmsg = mqtt::make_message("capture", payload);

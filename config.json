@@ -1,6 +1,6 @@
 {
 	"dbFile" : "journal.db",
-	"jpegQuality" : 0,
+	"jpegQuality" : 50,
 	"loginServer" : "http://demosite.imwork.net/",
 	"loginToken" : "9DB55BDB670632A80E6A55630CC9C59A",
 	"mqPass" : "123456",

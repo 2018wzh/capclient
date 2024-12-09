@@ -13,5 +13,7 @@ namespace Utils {
 	std::string base64Encode(const unsigned char* data, size_t len);
 	std::string toStr(uuidxx::uuid input);
 	std::string toStr(Event::Type e);
+	std::string toStr(Json::Value j);
+	std::string toStr(Event::Journal j);
 	Json::Value toJson(std::string s);
 };

@@ -19,7 +19,8 @@ namespace Event {
 		std::string uid;
 		Type type;
 		int time, value = 0;
-		std::string data = "", friendly;
+		Json::Value data;
+		std::string friendly;
 		std::string toJson();
 	};
 	struct MQcmd {};

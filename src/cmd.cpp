@@ -143,4 +143,8 @@ void cmd::test() {
         MQ::Connect();
 	MQ::Send("hello world");
 }
+#else
+void cmd::test() {
+	Logger::get_instance()->warn("Test command is deprecated");
+}
 #endif
