@@ -11,6 +11,7 @@
 #include <thread>
 #include "ui.h"
 #include "cmd.h"
+#include <ctime>
 using namespace Hook;
 std::thread Hook::Thread;
 std::atomic<bool> Hook::Running = false;
@@ -47,7 +48,7 @@ static LRESULT CALLBACK keyProc(int nCode, WPARAM wParam, LPARAM lParam) {
     last = wParam;
     lastkey = ks->vkCode;
     bool isDown = false;
-    
+    auto tm = time(NULL);
     if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) {
         if ((flags::Ctrl&&flags::Shift)||(flags::Ctrl&&(ks->vkCode!=VK_LSHIFT||ks->vkCode!=VK_RSHIFT))||flags::Alt) {
             hookJournal->Record(Event::Journal(ks->time)); // screenshot
@@ -65,7 +66,7 @@ static LRESULT CALLBACK keyProc(int nCode, WPARAM wParam, LPARAM lParam) {
             Logger::get_instance()->debug("Alt down");
         }
         isDown = true;
-        hookJournal->Record(Event::Journal(ks, isDown)); // keyboard
+        hookJournal->Record(Event::Journal(ks, isDown, tm)); // keyboard
     }
     else if (wParam == WM_KEYUP || wParam == WM_SYSKEYUP) {
         if (ks->vkCode == VK_SHIFT || ks->vkCode == VK_LSHIFT || ks->vkCode == VK_RSHIFT) {
@@ -91,14 +92,14 @@ static LRESULT CALLBACK mouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (nCode < 0) {
         return CallNextHookEx(mseHook, nCode, wParam, lParam);
     }
-
+    auto tm = time(NULL);
     bool isDown = false;
     MSLLHOOKSTRUCT* ks = (MSLLHOOKSTRUCT*)lParam;
     if (wParam != WM_MOUSEMOVE) {
         if (wParam == WM_LBUTTONDOWN || wParam == WM_RBUTTONDOWN || wParam == WM_MBUTTONDOWN)
             isDown = true;
-        hookJournal->Record(Event::Journal(ks, wParam, isDown)); // mouse
-        hookJournal->Record(Event::Journal(ks->time)); // screenshot
+        hookJournal->Record(Event::Journal(ks, wParam, isDown, tm)); // mouse
+        hookJournal->Record(Event::Journal(tm)); // screenshot
         last = ks->time;
     }
     return CallNextHookEx(mseHook, nCode, wParam, lParam);

@@ -2,6 +2,8 @@
 #include <windows.h>
 #include <tchar.h>
 #include <unordered_map>
+#include <locale>
+#include <codecvt>
 #include "logger.h"
 namespace Utils {
     static const char base64_chars[] =
@@ -199,8 +201,14 @@ namespace Utils {
         doc["type"] = Utils::toStr(j.type);
         doc["time"] = j.time;
         doc["data"] = j.data;
-        doc["friendly"] = j.friendly;
         auto out=Json::writeString(writer, doc);
         return out;
+    }
+    std::string toStr(std::wstring wstr) {
+        if (wstr.empty()) return std::string();
+        int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+        std::string strTo(size_needed, 0);
+        WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+        return strTo;
     }
 }

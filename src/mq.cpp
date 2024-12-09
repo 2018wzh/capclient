@@ -1,5 +1,6 @@
+// src/mq.cpp
+
 // mq.cpp
-//#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include "mq.h"
 #include "utils.h"
@@ -12,93 +13,105 @@
 #include <condition_variable>
 #include <mutex>
 
-std::atomic<bool> MQ::Running;
-std::thread MQ::Thread;
-std::queue<Event::Journal> messageQueue;
-std::mutex queueMutex;
-std::condition_variable cv;
+namespace MQ {
+    std::atomic<bool> Running;
+    std::thread Thread;
+    std::queue<Event::Journal> messageQueue;
+    std::mutex queueMutex;
+    std::condition_variable cv;
 
-// 移动 mqtt::async_client 到全局，以便在 MQ::Connect 和 MQ::DIsconnect 中使用
-mqtt::async_client* clientPtr = nullptr;
+    // 全局 MQTT 客户端指针
+    mqtt::async_client* clientPtr = nullptr;
 
-void eventLoop() {
-    while (MQ::Running) {
-        std::unique_lock<std::mutex> lock(queueMutex);
-        cv.wait(lock, [] { return !messageQueue.empty() || !MQ::Running; });
+    void eventLoop() {
+        while (Running) {
+            std::unique_lock<std::mutex> lock(queueMutex);
+            cv.wait(lock, [] { return !messageQueue.empty() || !Running; });
 
-        while (!messageQueue.empty()) {
-            auto msg = messageQueue.front();
-            messageQueue.pop();
-            lock.unlock();
+            while (!messageQueue.empty()) {
+                auto msg = messageQueue.front();
+                messageQueue.pop();
+                lock.unlock();
 
-            // 将 journalEvent 转换为字符串（需实现 toJson() 方法）
-            std::string payload = Utils::toStr(msg);
+                // 将 journalEvent 转换为字符串（需实现 toJson() 方法）
+                std::string payload = Utils::toStr(msg);
 
-            // 创建 MQTT 消息并发布
-            mqtt::message_ptr pubmsg = mqtt::make_message("capture", payload);
-            pubmsg->set_qos(1);
-            if (clientPtr && clientPtr->is_connected()) 
-                clientPtr->publish(pubmsg)->wait();
-            else 
-                Logger::get_instance()->error("MQTT client is not connected.");
-            Logger::get_instance()->debug("Message published");
-            lock.lock();
+                // 创建 MQTT 消息并发布
+                mqtt::message_ptr pubmsg = mqtt::make_message("capture", payload);
+                pubmsg->set_qos(1);
+                if (clientPtr && clientPtr->is_connected())
+                    clientPtr->publish(pubmsg)->wait();
+                else
+                    Logger::get_instance()->error("MQTT client is not connected.");
+                Logger::get_instance()->debug("Message published");
+                lock.lock();
+            }
         }
     }
-}
 
-void MQ::Connect() {
-    const std::string ADDRESS = Config::mqServer; // MQTT 服务器地址，例如 "tcp://localhost:1883"
-    const std::string CLIENT_ID = "capclient_publisher";
+    void Connect() {
+        const std::string ADDRESS = Config::mqServer; // MQTT 服务器地址，例如 "tcp://localhost:1883"
+        const std::string CLIENT_ID = "capclient_publisher";
 
-    clientPtr = new mqtt::async_client(ADDRESS, CLIENT_ID);
+        clientPtr = new mqtt::async_client(ADDRESS, CLIENT_ID);
 
-    mqtt::connect_options connOpts;
-    connOpts.set_clean_session(true);
-	connOpts.set_user_name(Config::mqUser);
-	connOpts.set_password(Config::mqPass);
-	Logger::get_instance()->debug("Connecting to MQTT server: {}", ADDRESS);
-    try {
-        // 连接到 MQTT 服务器
-        mqtt::token_ptr conntok = clientPtr->connect(connOpts);
-        conntok->wait();
-        MQ::Running = true;
-        MQ::Thread = std::thread(eventLoop);
-    }
-    catch (const mqtt::exception& e) {
-        Logger::get_instance()->error("MQTT CONNECT ERROR: {}", e.what());
-    }
-}
+        mqtt::connect_options connOpts;
+        connOpts.set_clean_session(true);
 
-void MQ::Send(Event::Journal e) {
-    std::lock_guard<std::mutex> lock(queueMutex);
-	Logger::get_instance()->debug("Adding message to queue");
-    messageQueue.push(e);
-    cv.notify_one();
-}
+        // 检查是否配置了 vhost
+        std::string username = Config::mqUser;
+        if (!Config::mqVHost.empty()) {
+            // 将 vhost 添加到用户名中，格式为 "username@vhost"
+            username += "@" + Config::mqVHost;
+        }
 
-void MQ::Disconnect() {
-    MQ::Running = false;
-    cv.notify_one();
-    if (MQ::Thread.joinable())
-        MQ::Thread.join();
+        connOpts.set_user_name(username);
+        connOpts.set_password(Config::mqPass);
 
-    try {
-        if (clientPtr) {
-            clientPtr->disconnect()->wait();
-            delete clientPtr;
-            clientPtr = nullptr;
+        Logger::get_instance()->debug("Connecting to MQTT server: {}", ADDRESS);
+        try {
+            // 连接到 MQTT 服务器
+            mqtt::token_ptr conntok = clientPtr->connect(connOpts);
+            conntok->wait();
+            Running = true;
+            Thread = std::thread(eventLoop);
+        }
+        catch (const mqtt::exception& e) {
+            Logger::get_instance()->error("MQTT CONNECT ERROR: {}", e.what());
         }
     }
-    catch (const mqtt::exception& e) {
-        Logger::get_instance()->error("MQTT DISCONNECT ERROR: {}", e.what());
+
+    void Send(Event::Journal e) {
+        std::lock_guard<std::mutex> lock(queueMutex);
+        Logger::get_instance()->debug("Adding message to queue");
+        messageQueue.push(e);
+        cv.notify_one();
     }
-}
-void MQ::Send(std::string s) {
-    mqtt::message_ptr pubmsg = mqtt::make_message("capture", s);
-    pubmsg->set_qos(1);
-    if (clientPtr && clientPtr->is_connected())
-        clientPtr->publish(pubmsg)->wait();
-    else
-        Logger::get_instance()->error("MQTT client is not connected.");
+
+    void Disconnect() {
+        Running = false;
+        cv.notify_one();
+        if (Thread.joinable())
+            Thread.join();
+
+        try {
+            if (clientPtr) {
+                clientPtr->disconnect()->wait();
+                delete clientPtr;
+                clientPtr = nullptr;
+            }
+        }
+        catch (const mqtt::exception& e) {
+            Logger::get_instance()->error("MQTT DISCONNECT ERROR: {}", e.what());
+        }
+    }
+
+    void Send(std::string s) {
+        mqtt::message_ptr pubmsg = mqtt::make_message("capture", s);
+        pubmsg->set_qos(1);
+        if (clientPtr && clientPtr->is_connected())
+            clientPtr->publish(pubmsg)->wait();
+        else
+            Logger::get_instance()->error("MQTT client is not connected.");
+    }
 }

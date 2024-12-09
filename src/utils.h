@@ -16,4 +16,5 @@ namespace Utils {
 	std::string toStr(Json::Value j);
 	std::string toStr(Event::Journal j);
 	Json::Value toJson(std::string s);
+	std::string toStr(std::wstring wstr);
 };

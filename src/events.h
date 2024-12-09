@@ -12,16 +12,15 @@ namespace Event {
 		Screen
 	};
 	struct Journal {
-		Journal(KBDLLHOOKSTRUCT* ks, bool isDown);
-		Journal(MSLLHOOKSTRUCT* ks, WPARAM w, bool isDown);
-		Journal(DWORD time);
+		Journal(KBDLLHOOKSTRUCT* ks, bool isDown,time_t time);
+		Journal(MSLLHOOKSTRUCT* ks, WPARAM w, bool isDown,time_t time);
+		Journal(time_t time);
 		uuidxx::uuid id;
 		std::string uid;
 		Type type;
-		int time, value = 0;
+		time_t time;
+		int value = 0;
 		Json::Value data;
-		std::string friendly;
-		std::string toJson();
 	};
 	struct MQcmd {};
 }

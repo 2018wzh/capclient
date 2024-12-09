@@ -51,7 +51,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
-    <None Include="ClassDiagram.cd" />
     <None Include="config.json" />
     <None Include="triplets\x64-windows-7-static.cmake" />
     <None Include="triplets\x64-windows-7.cmake" />
