@@ -118,5 +118,8 @@
     <None Include="triplets\x64-windows-7.cmake">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="packages.config">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

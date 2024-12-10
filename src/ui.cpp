@@ -68,7 +68,7 @@ namespace UI {
             uie.BoundingRect[2] = rect.right;
             uie.BoundingRect[3] = rect.bottom;
         }
-
+        Logger::get_instance()->debug("Successfully get UI Element");
         // ÊÍ·Å×ÊÔ´
         pElement->Release();
         pAutomation->Release();

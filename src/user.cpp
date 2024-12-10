@@ -10,10 +10,8 @@
 #include <sstream>
 User* currentUser;
 User::User(std::string token) {
-	if (token.empty())
-		throw std::exception("Token is empty");
-	id = "";
-	name = "";
+	this->id = "default";
+	this->name = "null";
 	this->token = token;
 	isLoggedin = false;
 }

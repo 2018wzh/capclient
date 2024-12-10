@@ -35,9 +35,9 @@ namespace MQ {
 
                 // 将 journalEvent 转换为字符串（需实现 toJson() 方法）
                 std::string payload = Utils::toStr(msg);
-
+                std::string channel = Config::mqVHost + "/" + Config::mqName;
                 // 创建 MQTT 消息并发布
-                mqtt::message_ptr pubmsg = mqtt::make_message("capture", payload);
+                mqtt::message_ptr pubmsg = mqtt::make_message(channel, payload);
                 pubmsg->set_qos(1);
                 if (clientPtr && clientPtr->is_connected())
                     clientPtr->publish(pubmsg)->wait();
@@ -60,11 +60,6 @@ namespace MQ {
 
         // 检查是否配置了 vhost
         std::string username = Config::mqUser;
-        if (!Config::mqVHost.empty()) {
-            // 将 vhost 添加到用户名中，格式为 "username@vhost"
-            username += "@" + Config::mqVHost;
-        }
-
         connOpts.set_user_name(username);
         connOpts.set_password(Config::mqPass);
 
@@ -76,7 +71,7 @@ namespace MQ {
             Running = true;
             Thread = std::thread(eventLoop);
         }
-        catch (const mqtt::exception& e) {
+        catch (std::exception& e) {
             Logger::get_instance()->error("MQTT CONNECT ERROR: {}", e.what());
         }
     }
@@ -107,7 +102,8 @@ namespace MQ {
     }
 
     void Send(std::string s) {
-        mqtt::message_ptr pubmsg = mqtt::make_message("capture", s);
+        std::string channel = Config::mqVHost + "/" + Config::mqName;
+        mqtt::message_ptr pubmsg = mqtt::make_message(channel, s);
         pubmsg->set_qos(1);
         if (clientPtr && clientPtr->is_connected())
             clientPtr->publish(pubmsg)->wait();

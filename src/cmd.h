@@ -11,6 +11,7 @@ namespace cmd {
     extern bool exitFlag;
     void start();
     void stop();
+    void reload();
     void exit();
     void login();
     void logout();
@@ -26,12 +27,11 @@ namespace cmd {
         LOGOUT,
         STATUS,
         TEST,
+        RELOAD,
         UNKNOWN
     };
-
-    Type getCommand(const std::string& input);
-
     typedef std::function<void()> CommandFunction;
     extern std::unordered_map<Type, CommandFunction> commandMap;
+    extern std::unordered_map<std::string,Type> cmdParse;
 }
 

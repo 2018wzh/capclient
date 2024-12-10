@@ -365,3 +365,5 @@ FodyWeavers.xsd
 vcpkg_installed/
 *.db
 log*
+config.json
+*.nupkg
