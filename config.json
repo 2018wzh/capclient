@@ -1,11 +1,11 @@
 {
-	"dbFile": "journal.db",
-	"jpegQuality": 50,
-	"loginServer": "http://demosite.imwork.net/",
-	"loginToken": "9DB55BDB670632A80E6A55630CC9C59A",
-	"mqPass": "Hqit123456@~",
-	"mqServer": "tcp://100.63.0.61:1883",
-	"mqUser": "sxfx",
-	"mqVHost": "sxfx",
-	"mqName": "amq.topic"
+	"dbFile" : "journal.db",
+	"jpegQuality" : 50,
+	"loginServer" : "http://demosite.imwork.net/",
+	"loginToken" : "9DB55BDB670632A80E6A55630CC9C59A",
+	"mqName" : "sxfx",
+	"mqPass" : "Hqit123456@~",
+	"mqServer" : "49.52.4.38:1883",
+	"mqUser" : "sxfx",
+	"mqVHost" : "sxfx"
 }

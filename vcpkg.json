@@ -5,6 +5,7 @@
     "sqlitecpp",
     "spdlog",
     "paho-mqttpp3",
+    "minio-cpp",
     "curlpp"
   ]
 }

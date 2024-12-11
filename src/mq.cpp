@@ -35,7 +35,7 @@ namespace MQ {
 
                 // 将 journalEvent 转换为字符串（需实现 toJson() 方法）
                 std::string payload = Utils::toStr(msg);
-                std::string channel = Config::mqVHost + "/" + Config::mqName;
+                std::string channel = Config::mqName;
                 // 创建 MQTT 消息并发布
                 mqtt::message_ptr pubmsg = mqtt::make_message(channel, payload);
                 pubmsg->set_qos(1);
@@ -59,7 +59,7 @@ namespace MQ {
         connOpts.set_clean_session(true);
 
         // 检查是否配置了 vhost
-        std::string username = Config::mqUser;
+        std::string username = Config::mqUser+":"+Config::mqVHost;
         connOpts.set_user_name(username);
         connOpts.set_password(Config::mqPass);
 
@@ -72,7 +72,7 @@ namespace MQ {
             Thread = std::thread(eventLoop);
         }
         catch (std::exception& e) {
-            Logger::get_instance()->error("MQTT CONNECT ERROR: {}", e.what());
+            Logger::get_instance()->error("MQTT connect error: {}", e.what());
         }
     }
 
@@ -97,17 +97,23 @@ namespace MQ {
             }
         }
         catch (const mqtt::exception& e) {
-            Logger::get_instance()->error("MQTT DISCONNECT ERROR: {}", e.what());
+            Logger::get_instance()->error("MQTT disconnect error: {}", e.what());
         }
     }
 
     void Send(std::string s) {
-        std::string channel = Config::mqVHost + "/" + Config::mqName;
-        mqtt::message_ptr pubmsg = mqtt::make_message(channel, s);
-        pubmsg->set_qos(1);
-        if (clientPtr && clientPtr->is_connected())
-            clientPtr->publish(pubmsg)->wait();
-        else
-            Logger::get_instance()->error("MQTT client is not connected.");
+        std::string channel = Config::mqName;
+        try {
+            mqtt::message_ptr pubmsg = mqtt::make_message(channel, s);
+            pubmsg->set_qos(1);
+            if (clientPtr && clientPtr->is_connected())
+                clientPtr->publish(pubmsg)->wait();
+            else
+                throw std::exception("MQTT client is not connected.");
+            Logger::get_instance()->info("Send message successfully");
+        }
+        catch (std::exception e) {
+            Logger::get_instance()->error("Send message error: {}", e.what());
+        }
     }
 }
