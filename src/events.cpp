@@ -60,3 +60,9 @@ Event::Journal::Journal(time_t tm) {
 	time = tm;
 	data["screenshot"] = Screenshot::Make();
 }
+Event::Journal::Journal(std::string ctrltype) {
+	id = uuidxx::uuid::Generate();
+	Json::StreamWriterBuilder writer;
+	type = Event::Type::Control;
+	data["action"] = ctrltype;
+}

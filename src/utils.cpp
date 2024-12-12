@@ -172,6 +172,8 @@ namespace Utils {
             return "keyboard";
         case Event::Type::Screen:
             return "screenshot";
+        case Event::Type::Control:
+            return "control";
         default:
             return "undefined";
         }

@@ -105,8 +105,11 @@ static LRESULT CALLBACK mouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
     return CallNextHookEx(mseHook, nCode, wParam, lParam);
 }
 void Hook::installHook(){
-    hookJournal = new Journal;
-	hookJournal->Open();
+    if (!hookJournal) {
+        hookJournal = new Journal;
+        hookJournal->Open();
+        hookJournal->Record(Event::Journal("start"));
+    }
     keyHook = SetWindowsHookEx(WH_KEYBOARD_LL, keyProc, nullptr, 0);
     mseHook = SetWindowsHookEx(WH_MOUSE_LL, mouseProc, nullptr, 0);
     if (!keyHook || !mseHook) {
@@ -127,6 +130,7 @@ void Hook::unInstallHook() {
         keyHook = nullptr;
     }
     if (hookJournal) {
+        hookJournal->Record(Event::Journal("stop"));
         hookJournal->Close();
         delete hookJournal;
         hookJournal = nullptr;

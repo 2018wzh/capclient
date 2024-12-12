@@ -9,12 +9,14 @@ namespace Event {
 	enum class Type {
 		Mouse,
 		Keyboard,
-		Screen
+		Screen,
+		Control,
 	};
 	struct Journal {
 		Journal(KBDLLHOOKSTRUCT* ks, bool isDown,time_t time);
 		Journal(MSLLHOOKSTRUCT* ks, WPARAM w, bool isDown,time_t time);
 		Journal(time_t time);
+		Journal(std::string ctrltype);
 		uuidxx::uuid id;
 		std::string uid;
 		Type type;
