@@ -10,5 +10,4 @@ namespace MQ {
 	void Send(Event::Journal e);
 	void Send(std::string s);
 	void Disconnect();
-	Event::Control Receive();
 }

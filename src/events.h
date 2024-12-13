@@ -21,7 +21,8 @@ namespace Event {
 		Journal(time_t time, MSLLHOOKSTRUCT* ks, WPARAM w, bool isDown);
 		Journal(time_t time);
 		Journal(time_t time, std::string ctrltype);
-		uuidxx::uuid id,session;
+		uuidxx::uuid id;
+		std::string session="0";
 		std::string uid="1";
 		Type type;
 		time_t time;

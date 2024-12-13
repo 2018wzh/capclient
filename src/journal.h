@@ -2,11 +2,11 @@
 #include "events.h"
 #include "database.h"
 #include <string>
-extern uuidxx::uuid g_SessionID;
+extern std::string g_SessionID;
 class Journal{
 private:
 	DB *db;
-	uuidxx::uuid sessionID;
+	std::string session;
 	time_t start;
 public:
 	Journal();

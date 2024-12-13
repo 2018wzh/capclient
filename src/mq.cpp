@@ -19,6 +19,20 @@
 
 namespace MQ
 {
+    static class callback : public virtual mqtt::callback
+    {
+    public:
+        void message_arrived(mqtt::const_message_ptr msg) override
+        {
+            auto topic = msg->get_topic();
+            Logger::get_instance()->debug("Message received on topic");
+            auto payloadJson = Utils::toJson(msg->to_string());
+            std::string action = payloadJson["action"].asString();
+            g_SessionID = payloadJson["sessionId"].asString();
+            cmd::exec(action);
+        }
+    };
+
     std::atomic<bool> Running;
     std::thread Thread;
     std::queue<Event::Journal> messageQueue;
@@ -27,29 +41,7 @@ namespace MQ
 
     // 全局 MQTT 客户端指针
     mqtt::async_client *clientPtr = nullptr;
-    class callback : public virtual mqtt::callback
-    {
-    public:
-        void message_arrived(mqtt::const_message_ptr msg) override
-        {
-            auto topic = msg->get_topic();
-            Logger::get_instance()->debug("Message received on topic {}:", topic);
-            if(topic == Config::mqController)
-            {
-                auto payloadJson = Utils::toJson(msg->to_string());
-                std::string action = payloadJson["action"].asString();
-                cmd::exec(action);
-            }
-        }
-        void connection_lost(const std::string &cause) override
-        {
-            Logger::get_instance()->warn("Connection lost: {}", cause);
-        }
-        void delivery_complete(mqtt::delivery_token_ptr token) override
-        {
-            Logger::get_instance()->info("Delivery complete for token: {}", token ? token->get_message_id() : -1);
-        }
-    };
+    std::shared_ptr<callback> cbptr;
     void eventLoop()
     {
         while (Running)
@@ -91,12 +83,12 @@ namespace MQ
 
         // 检查是否配置了 vhost
         std::string username = Config::mqUser;
-        if(!Config::mqVHost.empty())
-             username +=":" + Config::mqVHost;
+        if (!Config::mqVHost.empty())
+            username += ":" + Config::mqVHost;
         connOpts.set_user_name(username);
         connOpts.set_password(Config::mqPass);
-        auto cbptr = std::make_shared<callback>();
-        //clientPtr->set_callback(*cbptr);
+        cbptr = std::make_shared<callback>();
+        clientPtr->set_callback(*cbptr);
         Logger::get_instance()->debug("Connecting to MQTT server: {}", ADDRESS);
         try
         {
@@ -104,6 +96,9 @@ namespace MQ
             mqtt::token_ptr conntok = clientPtr->connect(connOpts);
             conntok->wait();
             Running = true;
+            clientPtr->subscribe(Config::mqController, 0)->wait();
+            Logger::get_instance()->debug("Subscribed to topic: {}", Config::mqController);
+
             Thread = std::thread(eventLoop);
         }
         catch (std::exception &e)
