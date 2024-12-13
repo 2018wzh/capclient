@@ -367,3 +367,7 @@ vcpkg_installed/
 log*
 config.json
 *.nupkg
+
+.vscode/
+utils/*.txt
+utils/*.jpeg

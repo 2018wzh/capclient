@@ -44,10 +44,6 @@ namespace cmd {
         Logger::get_instance()->info("Reload successfully");
     }
     void start() {
-        /*
-        if (!currentMQ)
-            currentMQ = new MQ(Config::mqServer, Config::mqUser, Config::mqPass);
-        */
         if (!currentUser)
             currentUser = new User(Config::loginToken);
         if (!currentUser->Check()) {
@@ -67,15 +63,11 @@ namespace cmd {
             Logger::get_instance()->warn("Hook is already Running");
         }
         /*
-        if (!currentMQ->isRunning())
-            currentMQ->Connect();
-        else
-            Logger::get_instance()->warn("MQ is already Running");
-        */
         if (!MQ::Running)
             MQ::Connect();
         else
             Logger::get_instance()->warn("MQ is already Running");
+        */
     }
     void stop() {
         if (Hook::Running.load()) {
@@ -91,21 +83,13 @@ namespace cmd {
             Logger::get_instance()->info("Hook is not Running");
         }
         /*
-        if (currentMQ->isRunning()) {
-            currentMQ->Disconnect();
-            Logger::get_instance()->info("MQ Disconnected");
-        }
-        else {
-            Logger::get_instance()->info("MQ is not Running");
-        }
-        */
         if (MQ::Running) {
             MQ::Disconnect();
             Logger::get_instance()->info("MQ Disconnected");
         }
         else {
             Logger::get_instance()->info("MQ is not Running");
-        }
+        }*/
     }
     void exit() {
         stop();

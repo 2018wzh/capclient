@@ -12,17 +12,20 @@ namespace Event {
 		Screen,
 		Control,
 	};
+	enum class Control {
+		START,
+		STOP
+	};
 	struct Journal {
 		Journal(time_t time,KBDLLHOOKSTRUCT* ks, bool isDown);
 		Journal(time_t time, MSLLHOOKSTRUCT* ks, WPARAM w, bool isDown);
 		Journal(time_t time);
 		Journal(time_t time, std::string ctrltype);
 		uuidxx::uuid id,session;
-		std::string uid;
+		std::string uid="1";
 		Type type;
 		time_t time;
 		int value = 0;
 		Json::Value data;
 	};
-	struct MQcmd {};
 }

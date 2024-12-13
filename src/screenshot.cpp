@@ -83,7 +83,7 @@ std::string Screenshot::Make() {
     unsigned char* jpegBuffer = nullptr;  // JPEG Í¼Ïñ»º³åÇø
     unsigned long jpegSize = 0;           // JPEG Í¼Ïñ´óÐ¡
 
-    if (tjCompress2(jpegCompressor, pPixels, screenWidth, 0, screenHeight, TJPF_RGB, &jpegBuffer, &jpegSize, TJSAMP_444, Config::jpegQuality, TJFLAG_FASTDCT) != 0) {
+    if (tjCompress2(jpegCompressor, pPixels, screenWidth, 0, screenHeight, TJPF_BGR, &jpegBuffer, &jpegSize, TJSAMP_444, Config::jpegQuality, TJFLAG_FASTDCT) != 0) {
         Logger::get_instance()->error("Failed to compress image: {}", tjGetErrorStr());
         tjDestroy(jpegCompressor);
         delete[] pPixels;

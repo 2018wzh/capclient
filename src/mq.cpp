@@ -2,18 +2,23 @@
 
 // mq.cpp
 #define NOMINMAX
-#include "mq.h"
-#include "utils.h"
 #include <mqtt/async_client.h>
 #include <thread>
 #include <atomic>
 #include <queue>
-#include "logger.h"
-#include "config.h"
+#include <mqtt/callback.h>
 #include <condition_variable>
 #include <mutex>
+#include <unordered_map>
+#include "config.h"
+#include "cmd.h"
+#include "mq.h"
+#include "utils.h"
+#include "logger.h"
+#include "utils.h"
 
-namespace MQ {
+namespace MQ
+{
     std::atomic<bool> Running;
     std::thread Thread;
     std::queue<Event::Journal> messageQueue;
@@ -21,14 +26,39 @@ namespace MQ {
     std::condition_variable cv;
 
     // 全局 MQTT 客户端指针
-    mqtt::async_client* clientPtr = nullptr;
-
-    void eventLoop() {
-        while (Running) {
+    mqtt::async_client *clientPtr = nullptr;
+    class callback : public virtual mqtt::callback
+    {
+    public:
+        void message_arrived(mqtt::const_message_ptr msg) override
+        {
+            auto topic = msg->get_topic();
+            Logger::get_instance()->debug("Message received on topic {}:", topic);
+            if(topic == Config::mqController)
+            {
+                auto payloadJson = Utils::toJson(msg->to_string());
+                std::string action = payloadJson["action"].asString();
+                cmd::exec(action);
+            }
+        }
+        void connection_lost(const std::string &cause) override
+        {
+            Logger::get_instance()->warn("Connection lost: {}", cause);
+        }
+        void delivery_complete(mqtt::delivery_token_ptr token) override
+        {
+            Logger::get_instance()->info("Delivery complete for token: {}", token ? token->get_message_id() : -1);
+        }
+    };
+    void eventLoop()
+    {
+        while (Running)
+        {
             std::unique_lock<std::mutex> lock(queueMutex);
-            cv.wait(lock, [] { return !messageQueue.empty() || !Running; });
-
-            while (!messageQueue.empty()) {
+            cv.wait(lock, []
+                    { return !messageQueue.empty() || !Running; });
+            while (!messageQueue.empty())
+            {
                 auto msg = messageQueue.front();
                 messageQueue.pop();
                 lock.unlock();
@@ -49,7 +79,8 @@ namespace MQ {
         }
     }
 
-    void Connect() {
+    void Connect()
+    {
         const std::string ADDRESS = Config::mqServer; // MQTT 服务器地址，例如 "tcp://localhost:1883"
         const std::string CLIENT_ID = "capclient_publisher";
 
@@ -59,51 +90,63 @@ namespace MQ {
         connOpts.set_clean_session(true);
 
         // 检查是否配置了 vhost
-        std::string username = Config::mqUser+":"+Config::mqVHost;
+        std::string username = Config::mqUser;
+        if(!Config::mqVHost.empty())
+             username +=":" + Config::mqVHost;
         connOpts.set_user_name(username);
         connOpts.set_password(Config::mqPass);
-
+        auto cbptr = std::make_shared<callback>();
+        //clientPtr->set_callback(*cbptr);
         Logger::get_instance()->debug("Connecting to MQTT server: {}", ADDRESS);
-        try {
+        try
+        {
             // 连接到 MQTT 服务器
             mqtt::token_ptr conntok = clientPtr->connect(connOpts);
             conntok->wait();
             Running = true;
             Thread = std::thread(eventLoop);
         }
-        catch (std::exception& e) {
+        catch (std::exception &e)
+        {
             Logger::get_instance()->error("MQTT connect error: {}", e.what());
         }
     }
 
-    void Send(Event::Journal e) {
+    void Send(Event::Journal e)
+    {
         std::lock_guard<std::mutex> lock(queueMutex);
         Logger::get_instance()->debug("Adding message to queue");
         messageQueue.push(e);
         cv.notify_one();
     }
 
-    void Disconnect() {
+    void Disconnect()
+    {
         Running = false;
         cv.notify_one();
         if (Thread.joinable())
             Thread.join();
 
-        try {
-            if (clientPtr) {
+        try
+        {
+            if (clientPtr)
+            {
                 clientPtr->disconnect()->wait();
                 delete clientPtr;
                 clientPtr = nullptr;
             }
         }
-        catch (const mqtt::exception& e) {
+        catch (const mqtt::exception &e)
+        {
             Logger::get_instance()->error("MQTT disconnect error: {}", e.what());
         }
     }
 
-    void Send(std::string s) {
+    void Send(std::string s)
+    {
         std::string channel = Config::mqName;
-        try {
+        try
+        {
             mqtt::message_ptr pubmsg = mqtt::make_message(channel, s);
             pubmsg->set_qos(1);
             if (clientPtr && clientPtr->is_connected())
@@ -112,7 +155,8 @@ namespace MQ {
                 throw std::exception("MQTT client is not connected.");
             Logger::get_instance()->info("Send message successfully");
         }
-        catch (std::exception e) {
+        catch (std::exception e)
+        {
             Logger::get_instance()->error("Send message error: {}", e.what());
         }
     }

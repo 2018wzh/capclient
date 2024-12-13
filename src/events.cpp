@@ -10,7 +10,7 @@ Event::Journal::Journal(time_t tm,MSLLHOOKSTRUCT *ks, WPARAM w,bool isDown){
 		data["action"] = "down";
 	else
 		data["action"] = "up";
-	data["value"] = int(w);
+	data["value"] = std::to_string(int(w));
 	data["friendly"] = Utils::wmConvert(w);
 	data["posX"] = int(ks->pt.x);
 	data["posY"] = int(ks->pt.y);
@@ -53,7 +53,7 @@ Event::Journal::Journal(time_t tm,KBDLLHOOKSTRUCT* ks,bool isDown) {
 		data["action"] = "down";
 	else
 		data["action"] = "up";
-	data["value"] = int(ks->vkCode);
+	data["value"] = std::to_string(int(ks->vkCode));
 	data["friendly"] = Utils::vkConvert(ks->vkCode);
 }
 Event::Journal::Journal(time_t tm) {
@@ -63,6 +63,7 @@ Event::Journal::Journal(time_t tm) {
 	type = Event::Type::Screen;
 	time = tm;
 	data["screenshot"] = Screenshot::Make();
+	data["value"] = "-1";
 }
 Event::Journal::Journal(time_t tm,std::string ctrltype) {
 	session = g_SessionID;
@@ -71,4 +72,5 @@ Event::Journal::Journal(time_t tm,std::string ctrltype) {
 	type = Event::Type::Control;
 	time = tm;
 	data["msg"] = ctrltype;
+	data["value"] = "-1";
 }

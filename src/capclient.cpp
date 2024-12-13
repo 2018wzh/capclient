@@ -6,6 +6,7 @@
 #include "hook.h"
 #include "logger.h"
 #include "cmd.h"
+#include "mq.h"
 #include "config.h"
 int main()
 {
@@ -22,8 +23,10 @@ int main()
         Logger::get_instance()->error(e.what());
         return 1;
     }
+    MQ::Connect();
     std::string command;
     while (!cmd::exitFlag && std::cout << ">" && std::cin >> command)
 		cmd::exec(command);
+    MQ::Disconnect();
     return 0;
 }
