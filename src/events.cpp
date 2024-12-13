@@ -2,8 +2,10 @@
 #include "utils.h"
 #include <ctime>
 #include "ui.h"
+#include "journal.h"
 #include "logger.h"
-Event::Journal::Journal(MSLLHOOKSTRUCT *ks, WPARAM w,bool isDown,time_t tm){
+Event::Journal::Journal(time_t tm,MSLLHOOKSTRUCT *ks, WPARAM w,bool isDown){
+	session = g_SessionID;
 	if (isDown)
 		data["action"] = "down";
 	else
@@ -42,7 +44,8 @@ Event::Journal::Journal(MSLLHOOKSTRUCT *ks, WPARAM w,bool isDown,time_t tm){
 	data["UIElement"] = UIElement;
 	//Logger::get_instance()->debug(Utils::toStr(UIElement));
 }
-Event::Journal::Journal(KBDLLHOOKSTRUCT* ks,bool isDown,time_t tm) {
+Event::Journal::Journal(time_t tm,KBDLLHOOKSTRUCT* ks,bool isDown) {
+	session = g_SessionID;
 	id = uuidxx::uuid::Generate();
 	type = Event::Type::Keyboard;
 	time = tm;
@@ -54,15 +57,18 @@ Event::Journal::Journal(KBDLLHOOKSTRUCT* ks,bool isDown,time_t tm) {
 	data["friendly"] = Utils::vkConvert(ks->vkCode);
 }
 Event::Journal::Journal(time_t tm) {
+	session = g_SessionID;
 	id = uuidxx::uuid::Generate();
 	Json::StreamWriterBuilder writer;
 	type = Event::Type::Screen;
 	time = tm;
 	data["screenshot"] = Screenshot::Make();
 }
-Event::Journal::Journal(std::string ctrltype) {
+Event::Journal::Journal(time_t tm,std::string ctrltype) {
+	session = g_SessionID;
 	id = uuidxx::uuid::Generate();
 	Json::StreamWriterBuilder writer;
 	type = Event::Type::Control;
-	data["action"] = ctrltype;
+	time = tm;
+	data["msg"] = ctrltype;
 }

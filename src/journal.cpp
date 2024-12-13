@@ -4,6 +4,7 @@
 #include "mq.h"
 #include "user.h"
 #include "config.h"
+uuidxx::uuid g_SessionID;
 Journal::Journal() {
 	db = new DB(Config::dbFile);
 	sessionID = uuidxx::uuid::Generate();
@@ -11,7 +12,9 @@ Journal::Journal() {
 	Logger::get_instance()->info("[{}] Session started",Utils::toStr(sessionID));
 }
 void Journal::Open() {
+	g_SessionID = this->sessionID;
 	db->Open(Utils::toStr(sessionID), start);
+	MQ::Send(Event::Journal(start, "start"));
 }
 void Journal::Record(Event::Journal e) {
 	Logger::get_instance()->info("[{}][{}] {}", e.time,Utils::toStr(e.id),Utils::toStr(e.type));
@@ -22,6 +25,8 @@ void Journal::Record(Event::Journal e) {
 void Journal::Close() {
 	time_t end;
 	time(&end);
+	MQ::Send(Event::Journal(end, "end"));
 	db->Close(end);
+	g_SessionID = NULL;
 	delete db;
 }

@@ -2,6 +2,7 @@
 #include "events.h"
 #include "database.h"
 #include <string>
+extern uuidxx::uuid g_SessionID;
 class Journal{
 private:
 	DB *db;

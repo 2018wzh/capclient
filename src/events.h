@@ -13,11 +13,11 @@ namespace Event {
 		Control,
 	};
 	struct Journal {
-		Journal(KBDLLHOOKSTRUCT* ks, bool isDown,time_t time);
-		Journal(MSLLHOOKSTRUCT* ks, WPARAM w, bool isDown,time_t time);
+		Journal(time_t time,KBDLLHOOKSTRUCT* ks, bool isDown);
+		Journal(time_t time, MSLLHOOKSTRUCT* ks, WPARAM w, bool isDown);
 		Journal(time_t time);
-		Journal(std::string ctrltype);
-		uuidxx::uuid id;
+		Journal(time_t time, std::string ctrltype);
+		uuidxx::uuid id,session;
 		std::string uid;
 		Type type;
 		time_t time;

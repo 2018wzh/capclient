@@ -7,10 +7,6 @@
 #include "logger.h"
 #include "cmd.h"
 #include "config.h"
-
-
-
-
 int main()
 {
 #ifdef _DEBUG

@@ -50,7 +50,7 @@ static LRESULT CALLBACK keyProc(int nCode, WPARAM wParam, LPARAM lParam) {
     bool isDown = false;
     auto tm = time(NULL);
     if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) {
-        if ((flags::Ctrl&&flags::Shift)||(flags::Ctrl&&(ks->vkCode!=VK_LSHIFT||ks->vkCode!=VK_RSHIFT))||flags::Alt) {
+        if ((flags::Ctrl&&flags::Shift)||(flags::Ctrl&&(ks->vkCode!=VK_LSHIFT&&ks->vkCode!=VK_RSHIFT))||flags::Alt) {
             hookJournal->Record(Event::Journal(ks->time)); // screenshot
         }
         if (ks->vkCode == VK_SHIFT||ks->vkCode==VK_LSHIFT || ks->vkCode == VK_RSHIFT) {
@@ -66,7 +66,7 @@ static LRESULT CALLBACK keyProc(int nCode, WPARAM wParam, LPARAM lParam) {
             Logger::get_instance()->debug("Alt down");
         }
         isDown = true;
-        hookJournal->Record(Event::Journal(ks, isDown, tm)); // keyboard
+        hookJournal->Record(Event::Journal(tm, ks, isDown)); // keyboard
     }
     else if (wParam == WM_KEYUP || wParam == WM_SYSKEYUP) {
         if (ks->vkCode == VK_SHIFT || ks->vkCode == VK_LSHIFT || ks->vkCode == VK_RSHIFT) {
@@ -98,7 +98,7 @@ static LRESULT CALLBACK mouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (wParam != WM_MOUSEMOVE) {
         if (wParam == WM_LBUTTONDOWN || wParam == WM_RBUTTONDOWN || wParam == WM_MBUTTONDOWN)
             isDown = true;
-        hookJournal->Record(Event::Journal(ks, wParam, isDown, tm)); // mouse
+        hookJournal->Record(Event::Journal(tm, ks, wParam, isDown)); // mouse
         hookJournal->Record(Event::Journal(tm)); // screenshot
         last = ks->time;
     }
@@ -108,7 +108,6 @@ void Hook::installHook(){
     if (!hookJournal) {
         hookJournal = new Journal;
         hookJournal->Open();
-        hookJournal->Record(Event::Journal("start"));
     }
     keyHook = SetWindowsHookEx(WH_KEYBOARD_LL, keyProc, nullptr, 0);
     mseHook = SetWindowsHookEx(WH_MOUSE_LL, mouseProc, nullptr, 0);
@@ -130,7 +129,6 @@ void Hook::unInstallHook() {
         keyHook = nullptr;
     }
     if (hookJournal) {
-        hookJournal->Record(Event::Journal("stop"));
         hookJournal->Close();
         delete hookJournal;
         hookJournal = nullptr;

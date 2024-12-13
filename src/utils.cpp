@@ -198,6 +198,7 @@ namespace Utils {
         Json::StreamWriterBuilder writer;
         writer["indentation"] = "";
         Json::Value doc;
+        doc["session"] = Utils::toStr(j.session);
         doc["id"] = Utils::toStr(j.id);
         doc["uid"] = j.uid;
         doc["type"] = Utils::toStr(j.type);
