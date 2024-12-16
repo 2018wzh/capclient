@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.11.35431.28
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.35425.106
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "capclient", "capclient.vcxproj", "{681646DD-6F69-4916-804E-2D052610AE95}"
+EndProject
+Project("{29E15B7A-B420-4782-B51D-1BE2F663A160}") = "setup", "setup\setup\setup.innoproj", "{1C7CA525-6CE4-49DC-AE13-E8333A525DD9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,6 +24,12 @@ Global
 		{681646DD-6F69-4916-804E-2D052610AE95}.Release|x64.Build.0 = Release|x64
 		{681646DD-6F69-4916-804E-2D052610AE95}.Release|x86.ActiveCfg = Release|Win32
 		{681646DD-6F69-4916-804E-2D052610AE95}.Release|x86.Build.0 = Release|Win32
+		{1C7CA525-6CE4-49DC-AE13-E8333A525DD9}.Debug|x64.ActiveCfg = Debug|x86
+		{1C7CA525-6CE4-49DC-AE13-E8333A525DD9}.Debug|x86.ActiveCfg = Debug|x86
+		{1C7CA525-6CE4-49DC-AE13-E8333A525DD9}.Debug|x86.Build.0 = Debug|x86
+		{1C7CA525-6CE4-49DC-AE13-E8333A525DD9}.Release|x64.ActiveCfg = Release|x86
+		{1C7CA525-6CE4-49DC-AE13-E8333A525DD9}.Release|x86.ActiveCfg = Release|x86
+		{1C7CA525-6CE4-49DC-AE13-E8333A525DD9}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

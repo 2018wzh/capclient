@@ -1,0 +1,25 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>1.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>1c7ca525-6ce4-49dc-ae13-e8333a525dd9</ProjectGuid>
+    <AssemblyName>setup</AssemblyName>
+    <Name>setup</Name>
+    <RootNamespace>setup</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>
+    </OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputPath>
+    </OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="InstallScript.iss">
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\InnoSetupTools\InnoSetupProject.targets" />
+</Project>
