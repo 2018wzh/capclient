@@ -6,9 +6,9 @@
 #include <ctime>
 #include <memory>
 
-std::shared_ptr<spdlog::logger> &Logger::get_instance()
-{
+std::shared_ptr<spdlog::logger>& Logger::get_instance() {
     static std::shared_ptr<spdlog::logger> instance = create_logger();
+    instance->flush();
     return instance;
 }
 

@@ -17,6 +17,7 @@ User::User(std::string token) {
 	status = true;
 }
 void User::Login() {
+	/*
     try {
         curlpp::Cleanup cleanup;
         std::ostringstream responseStream;
@@ -33,7 +34,9 @@ void User::Login() {
 		Logger::get_instance()->error(e.what());
 		throw std::exception("Login failed");
     }
-	status = 1;
+	*/
+	id = Config::userName;
+	isLoggedin = 1;
 }
 void User::Logout() {
 	if (!status)

@@ -26,6 +26,7 @@ namespace cmd {
         {"logout",Type::LOGOUT},
         {"status",Type::STATUS},
         {"test",Type::TEST},
+        {"end",Type::STOP},
         {"reload",Type::RELOAD}
     };
     void exec(const std::string& input) {
@@ -44,12 +45,14 @@ namespace cmd {
         Logger::get_instance()->info("Reload successfully");
     }
     void start() {
+        
         if (!currentUser)
             currentUser = new User(Config::loginToken);
+        /*
         if (!currentUser->Check()) {
             Logger::get_instance()->warn("Please login first");
             currentUser->Login();
-        }
+        }*/
         Hook::Thread = std::thread(Hook::ThreadFunc);
         if (!Hook::Running.load()) {
             Hook::Running = true;
