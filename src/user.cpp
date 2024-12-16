@@ -14,7 +14,7 @@ User::User(std::string token) {
 	this->id = "default";
 	this->name = L"NULL";
 	this->token = token;
-	status = true;
+	status = 0;
 }
 void User::Login() {
 	/*
@@ -36,7 +36,7 @@ void User::Login() {
     }
 	*/
 	id = Config::userName;
-	isLoggedin = 1;
+	status = 1;
 }
 void User::Logout() {
 	if (!status)
