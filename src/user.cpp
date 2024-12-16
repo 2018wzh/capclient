@@ -9,11 +9,12 @@
 #include <curlpp/Options.hpp>
 #include <sstream>
 User* currentUser;
+
 User::User(std::string token) {
 	this->id = "default";
-	this->name = "null";
+	this->name = L"NULL";
 	this->token = token;
-	isLoggedin = false;
+	status = true;
 }
 void User::Login() {
     try {
@@ -32,9 +33,9 @@ void User::Login() {
 		Logger::get_instance()->error(e.what());
 		throw std::exception("Login failed");
     }
-	isLoggedin = 1;
+	status = 1;
 }
 void User::Logout() {
-	if (!isLoggedin)
+	if (!status)
 		throw std::exception("Not logged in");
 }

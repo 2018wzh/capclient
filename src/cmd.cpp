@@ -73,7 +73,7 @@ namespace cmd {
         if (Hook::Running.load()) {
             Hook::Running = false;
             if (Hook::Thread.joinable()) {
-                // ·¢ËÍÒ»¸ö¿ÕÏûÏ¢ÒÔÈ·±£ GetMessage ÄÜ¹»·µ»Ø
+                // ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½È·ï¿½ï¿½ GetMessage ï¿½Ü¹ï¿½ï¿½ï¿½ï¿½ï¿½
                 PostThreadMessage(GetThreadId(static_cast<HANDLE>(Hook::Thread.native_handle())), WM_QUIT, 0, 0);
                 Hook::Thread.join();
             }
@@ -95,7 +95,6 @@ namespace cmd {
         stop();
         Config::Save();
         Logger::get_instance()->info("Exiting program");
-        exitFlag = true;
     }
     void login() {
         if (!currentUser)
