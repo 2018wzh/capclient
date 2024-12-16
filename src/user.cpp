@@ -38,4 +38,5 @@ void User::Login() {
 void User::Logout() {
 	if (!status)
 		throw std::exception("Not logged in");
+	status = 0;
 }

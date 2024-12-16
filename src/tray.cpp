@@ -94,7 +94,7 @@ void Tray::ShowContextMenu(HWND hwnd, POINT pt)
 
     // 添加其他菜单项
     InsertMenu(hMenu, -1, MF_BYPOSITION, IDM_CONFIG, L"设置");
-    if (!user_status)
+    if (user_status)
         InsertMenu(hMenu, -1, MF_BYPOSITION, IDM_LOGOUT, L"注销");
     else
         InsertMenu(hMenu, -1, MF_BYPOSITION, IDM_LOGIN, L"登录");
@@ -133,7 +133,6 @@ LRESULT CALLBACK Tray::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
             cmd::logout();
             break;
         case IDM_CONFIG:
-            Config::CreateConfigWindow();
             break;
         case IDM_EXIT:
             // 处理“退出”菜单项

@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.35425.106
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "capclient", "capclient.vcxproj", "{681646DD-6F69-4916-804E-2D052610AE95}"
 EndProject
-Project("{29E15B7A-B420-4782-B51D-1BE2F663A160}") = "setup", "setup\setup\setup.innoproj", "{1C7CA525-6CE4-49DC-AE13-E8333A525DD9}"
+Project("{29E15B7A-B420-4782-B51D-1BE2F663A160}") = "setup", "setup\setup.innoproj", "{1C7CA525-6CE4-49DC-AE13-E8333A525DD9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

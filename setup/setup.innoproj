@@ -8,6 +8,7 @@
     <AssemblyName>setup</AssemblyName>
     <Name>setup</Name>
     <RootNamespace>setup</RootNamespace>
+    <InnoSetupPath>D:\Scoop\User\shims\</InnoSetupPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <OutputPath>
