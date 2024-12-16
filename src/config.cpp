@@ -3,7 +3,7 @@
 #include <fstream>
 #include "logger.h"
 namespace Config {
-    std::string mqServer, loginServer, loginToken, mqUser, mqPass, dbFile, mqVHost, mqName, mqController;
+    std::string mqServer, loginServer, loginToken, mqUser, mqPass, dbFile, mqVHost, mqName, mqController,userName;
     int jpegQuality;
     std::string configFile = "config.json";
 }
@@ -21,6 +21,7 @@ void Config::Read() {
 		root["mqVHost"] = "";
         root["mqName"] = "";
         root["mqController"] = "controller";
+        root["userName"] = "default";
         std::ofstream outFile(Config::configFile);
         if (!outFile.is_open()) {
             Logger::get_instance()->error("Unable to create default config file");
@@ -39,12 +40,13 @@ void Config::Read() {
         Config::loginServer = root["loginServer"].asString();
         Config::loginToken = root["loginToken"].asString();
         Config::mqPass = root["mqPass"].asString();
-		Config::mqUser = root["mqUser"].asString();
-		Config::dbFile = root["dbFile"].asString();
-		Config::jpegQuality = root["jpegQuality"].asInt();
-		Config::mqVHost = root["mqVHost"].asString();
+        Config::mqUser = root["mqUser"].asString();
+        Config::dbFile = root["dbFile"].asString();
+        Config::jpegQuality = root["jpegQuality"].asInt();
+        Config::mqVHost = root["mqVHost"].asString();
         Config::mqName = root["mqName"].asString();
         Config::mqController = root["mqController"].asString();
+        Config::userName = root["userName"].asString();
     }
     catch (std::exception& e) {
         Logger::get_instance()->error(e.what());
@@ -63,6 +65,7 @@ void Config::Save() {
 	root["mqVHost"] = Config::mqVHost;
     root["mqName"] = Config::mqName;
     root["mqController"] = Config::mqController;
+    root["userName"] = "default";
 	std::ofstream outFile(Config::configFile);
 	if (!outFile.is_open()) {
 		Logger::get_instance()->error("Unable to save config file");

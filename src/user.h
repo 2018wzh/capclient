@@ -5,7 +5,7 @@ private:
 	std::string token = "";
 	bool isLoggedin = 0;
 public:
-	std::string id,name;
+	std::string id="default", name="Default";
 	User(std::string token);
 	void Login();
 	void Logout();
